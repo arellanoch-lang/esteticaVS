@@ -692,13 +692,7 @@ input[aria-invalid="true"]{border-color:#B03A6F}
 /* =========================================================
    CONFIGURACIÓN — lo único que hay que tocar para publicar
    ========================================================= */
-var CONFIG = {apiKey: "AIzaSyDT8DLIrCyjMcgAGZf3NFb4S31lnl275Cs",
-  authDomain: "valenia-agenda.firebaseapp.com",
-  projectId: "valenia-agenda",
-  storageBucket: "valenia-agenda.firebasestorage.app",
-  messagingSenderId: "460354202853",
-  appId: "1:460354202853:web:2bfe1a9cc11dee436ff80c"
-};
+var CONFIG = {
   telefono: '+34 638 17 70 78',
   centros: [
     { id: 'corella', nombre: 'Corella', direccion: 'C/ María Teresa Sáenz de Heredia, 39' },
@@ -718,7 +712,14 @@ var CONFIG = {apiKey: "AIzaSyDT8DLIrCyjMcgAGZf3NFb4S31lnl275Cs",
   diasReservables: 30,            // cuántos días por delante se puede reservar
   margenMinutos: 60,              // no se puede reservar con menos de 1 h de antelación
   // Datos del proyecto de Firebase (vacío = modo demostración)
-  firebase: { apiKey: '', authDomain: '', projectId: '', appId: '' }
+  firebase: {
+    apiKey: "AIzaSyDT8DLIrCyjMcgAGZf3NFb4S31lnl275Cs",
+    authDomain: "valenia-agenda.firebaseapp.com",
+    projectId: "valenia-agenda",
+    storageBucket: "valenia-agenda.firebasestorage.app",
+    messagingSenderId: "460354202853",
+    appId: "1:460354202853:web:2bfe1a9cc11dee436ff80c"
+  }
 };
 
 var SERVICIOS = [
