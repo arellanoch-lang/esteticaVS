@@ -279,7 +279,7 @@ input[aria-invalid="true"]{border-color:#B03A6F}
 .rejilla thead th span{display:block}
 .rejilla .col-hora{width:70px;border-left:0;font-variant-numeric:tabular-nums;color:var(--texto-suave);font-weight:500;padding:12px 10px;text-align:left}
 .btn-dia{font:inherit;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--lotus);background:none;border:0;padding:4px 0;cursor:pointer;font-weight:600}
-.celda{height:58px}
+.celda{height:64px}
 .celda button{font:inherit;width:100%;height:100%;min-height:50px;border-radius:8px;border:1px solid transparent;text-align:left;padding:6px 10px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;gap:2px;overflow:hidden}
 .celda.libre button{background:none;color:var(--taupe);font-size:1.2rem;border:1px dashed transparent;align-items:center}
 .celda.libre button:hover{border-color:var(--rosa-empolvado);color:var(--lotus)}
@@ -297,7 +297,26 @@ input[aria-invalid="true"]{border-color:#B03A6F}
 .modal-sub{font-size:.9rem;color:var(--texto-suave)}
 .modal-form{padding:0;gap:14px}
 .modal-dl{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:4px 0;font-size:.92rem}
-.modal-acciones{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;align-items:center}
+.modal-acciones{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;align-items:center}
+.modal .btn{padding:10px 16px;font-size:.66rem;letter-spacing:.14em}
+.modal .btn-texto{font-size:.66rem;min-height:36px}
+.msgs-caja{border-top:1px solid var(--linea);padding-top:12px;margin-top:4px}
+.msgs-titulo{font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--texto-suave);font-weight:600;margin-bottom:6px}
+.msgs-lista{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.msg{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--linea)}
+.msg:last-child{border-bottom:0}
+.msg-check{display:flex;align-items:flex-start;gap:10px;cursor:pointer;min-width:0}
+.msg-check input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--lotus);flex:none;padding:0}
+.msg-check strong{display:block;font-size:.84rem;font-weight:600;color:var(--carbon)}
+.msg-check small{display:block;font-size:.74rem;color:var(--texto-suave)}
+.msg.hecho small{color:#3E7D5A}
+.btn-msg{flex:none;font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;text-decoration:none;color:var(--blanco);background:#25A366;border-radius:999px;padding:8px 14px;min-height:32px;display:inline-flex;align-items:center}
+.btn-msg:hover{background:#1E8A55}
+.msg.hecho .btn-msg{background:none;color:#1E8A55;border:1px solid #9BD3B5}
+.msg-sin{font-size:.74rem;color:var(--taupe)}
+.puntos{display:flex;gap:3px;margin-top:2px}
+.puntos i{width:6px;height:6px;border-radius:50%;border:1px solid var(--rosa-empolvado);background:var(--blanco)}
+.puntos i.si{background:#25A366;border-color:#25A366}
 #m-anular{color:#B03A6F}
 </style>
 
@@ -709,6 +728,8 @@ var CONFIG = {
     { id: 'l3', centro: 'logrono', nombre: 'Profesional 3' }
   ],
   horas: ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'],
+  // Enlaces de Google para pedir reseña (Google Business → «Pedir reseñas»). Vacío = el mensaje pide la reseña sin enlace.
+  resenas: { corella: '', logrono: '' },
   diasAbiertos: [1,2,3,4,5],      // lunes a viernes
   diasReservables: 30,            // cuántos días por delante se puede reservar
   margenMinutos: 60,              // no se puede reservar con menos de 1 h de antelación
@@ -821,6 +842,7 @@ function DemoStore(){
       guardar(); return Promise.resolve(id);
     },
     liberar: function(id){ delete data.ocupado[id]; delete data.citas[id]; guardar(); return Promise.resolve(); },
+    marcarMensaje: function(id, k, v){ if (data.citas[id]) { data.citas[id].mensajes = Object.assign({}, data.citas[id].mensajes, (function(o){ o[k] = v; return o; })({})); guardar(); } return Promise.resolve(); },
     mover: function(idViejo, n){
       var nid = slotId(n.fecha, n.hora, n.prof);
       if (data.ocupado[nid]) return Promise.reject(errOcupado());
@@ -878,6 +900,9 @@ function FirebaseStore(cfg){
     },
     liberar: function(id){
       return listo.then(function(x){ var b = x.db.batch(); b.delete(x.db.collection('ocupado').doc(id)); b.delete(x.db.collection('citas').doc(id)); return b.commit(); });
+    },
+    marcarMensaje: function(id, k, v){
+      return listo.then(function(x){ var u = {}; u['mensajes.' + k] = v; return x.db.collection('citas').doc(id).update(u); });
     },
     mover: function(idViejo, n){
       return listo.then(function(x){
@@ -1172,7 +1197,8 @@ function pintarRejilla(){
       } else if (o) {
         citas++;
         var c = P.datos.citas[id] || {};
-        html += '<td class="celda cita' + pasado + '"><button type="button" data-id="' + id + '"><strong>' + esc(c.nombre || 'Cita') + '</strong><small>' + esc(c.servicio || '') + '</small></button></td>';
+        var env = c.mensajes || {}, nEnv = MENSAJES.filter(function(m){ return env[m.k]; }).length;
+        html += '<td class="celda cita' + pasado + '"><button type="button" data-id="' + id + '"><strong>' + esc(c.nombre || 'Cita') + '</strong><small>' + esc(c.servicio || '') + '</small><span class="puntos" aria-label="' + nEnv + ' de 3 mensajes enviados">' + MENSAJES.map(function(m){ return '<i class="' + (env[m.k] ? 'si' : '') + '"></i>'; }).join('') + '</span></button></td>';
       } else {
         if (!pasado) libres++;
         html += '<td class="celda libre' + pasado + '"><button type="button" data-libre="' + id + '" data-hora="' + h + '" data-prof="' + p.id + '" aria-label="' + h + ', ' + esc(p.nombre) + ', libre">+</button></td>';
@@ -1234,16 +1260,16 @@ function modalOcupado(id){
     return;
   }
   c = c || {};
-  var wa = waLink(c.telefono, textoRecordatorio(c, o));
   abrirModal(cabModal(c.nombre || 'Cita', o.hora + ' · ' + p.nombre + ' · ' + centro(o.centro).nombre) +
-    '<dl class="modal-dl"><dt>Tratamiento</dt><dd>' + esc(c.servicio) + '</dd><dt>Teléfono</dt><dd>' + esc(c.telefono || '—') + '</dd>' +
+    '<dl class="modal-dl"><dt>Tratamiento</dt><dd>' + esc(c.servicio) + '</dd><dt>Día</dt><dd>' + esc(fechaTxt(o.fecha)) + '</dd><dt>Teléfono</dt><dd>' + esc(c.telefono || '—') + '</dd>' +
     (c.notas ? '<dt>Comentarios</dt><dd>' + esc(c.notas) + '</dd>' : '') +
     '<dt>Reservada</dt><dd>' + (c.origen === 'clinica' ? 'Por la clínica' : 'Desde la web') + '</dd></dl>' +
+    '<div class="msgs-caja"><p class="msgs-titulo">Mensajes de WhatsApp</p><ul class="msgs-lista" id="m-msgs"></ul></div>' +
     '<div class="modal-acciones" id="m-acc">' +
-      '<button class="btn btn-lotus" type="button" id="m-mover">Cambiar día u hora</button>' +
-      (wa ? '<a class="btn btn-linea" href="' + wa + '" target="_blank" rel="noopener">Enviar WhatsApp</a>' : '') +
+      '<button class="btn btn-linea" type="button" id="m-mover">Cambiar día u hora</button>' +
       '<button class="btn-texto" type="button" id="m-anular">Anular cita</button>' +
-    '</div>' + (wa ? '' : '<p class="modal-sub">Sin teléfono válido para WhatsApp.</p>'));
+    '</div>');
+  pintarMensajes(id, c, o);
   $('m-mover').addEventListener('click', function(){ modalMover(id); });
   $('m-anular').addEventListener('click', function(){
     $('m-acc').innerHTML = '<p class="modal-sub" style="width:100%">¿Seguro? La hora volverá a quedar libre en la web.</p><button class="btn btn-lotus" type="button" id="m-si">Sí, anular</button><button class="btn btn-linea" type="button" id="m-no">No</button>';
@@ -1263,6 +1289,40 @@ function modalOcupado(id){
   });
 }
 
+var MENSAJES = [
+  { k: 'confirmacion', nombre: '1 · Confirmación de la reserva', cuando: 'Al reservar' },
+  { k: 'recordatorio', nombre: '2 · Recordatorio', cuando: 'El día antes' },
+  { k: 'agradecimiento', nombre: '3 · Agradecimiento y reseña', cuando: 'Después de la cita' }
+];
+function textoMensaje(k, c, o){
+  if (k === 'confirmacion') return textoConfirmacion(c, o);
+  if (k === 'recordatorio') return textoRecordatorio(c, o);
+  return textoAgradecimiento(c, o);
+}
+function horaEnvio(iso){ var d = new Date(iso); return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+function pintarMensajes(id, c, o){
+  var ul = $('m-msgs'); if (!ul) return;
+  var env = c.mensajes || {};
+  ul.innerHTML = MENSAJES.map(function(m){
+    var link = waLink(c.telefono, textoMensaje(m.k, c, o)), hecho = env[m.k];
+    return '<li class="msg' + (hecho ? ' hecho' : '') + '">' +
+      '<label class="msg-check"><input type="checkbox" data-k="' + m.k + '"' + (hecho ? ' checked' : '') + '><span><strong>' + esc(m.nombre) + '</strong><small>' + (hecho ? 'Enviado ' + horaEnvio(hecho) : m.cuando) + '</small></span></label>' +
+      (link ? '<a class="btn-msg" href="' + link + '" target="_blank" rel="noopener" data-k="' + m.k + '">Enviar</a>' : '<span class="msg-sin">Sin teléfono</span>') +
+      '</li>';
+  }).join('');
+  function marcar(k, v){
+    c.mensajes = Object.assign({}, c.mensajes); c.mensajes[k] = v;
+    pintarMensajes(id, c, o);
+    store.marcarMensaje(id, k, v).catch(function(){});
+  }
+  ul.querySelectorAll('input[type=checkbox]').forEach(function(cb){
+    cb.addEventListener('change', function(){ marcar(cb.getAttribute('data-k'), cb.checked ? new Date().toISOString() : null); });
+  });
+  ul.querySelectorAll('a.btn-msg').forEach(function(a){
+    a.addEventListener('click', function(){ var k = a.getAttribute('data-k'); if (!(c.mensajes || {})[k]) marcar(k, new Date().toISOString()); });
+  });
+}
+
 /* ---------- WhatsApp ---------- */
 function waLink(tel, texto){
   var d = String(tel || '').replace(/\D/g, '');
@@ -1272,14 +1332,25 @@ function waLink(tel, texto){
   return 'https://wa.me/' + d + '?text=' + encodeURIComponent(texto);
 }
 function saludo(c){ var n = String(c.nombre || '').trim().split(' ')[0]; return 'Hola' + (n ? ' ' + n : '') + ', te escribimos de Valênia Simões'; }
+function serv(c){ var t = String(c.servicio || 'tratamiento'); return t.charAt(0).toLowerCase() + t.slice(1); }
+function textoConfirmacion(c, o){
+  var ce = centro(o.centro);
+  return saludo(c) + '. Tu cita de ' + serv(c) + ' queda confirmada para el ' + fechaTxt(o.fecha) + ' a las ' + o.hora + ' en nuestro centro de ' + ce.nombre + ' (' + ce.direccion + '). Si necesitas cambiarla, contéstanos por aquí. ¡Te esperamos!';
+}
 function textoRecordatorio(c, o){
-  return saludo(c) + ' (' + centro(o.centro).nombre + '). Te recordamos tu cita de ' + c.servicio + ' el ' + fechaTxt(o.fecha) + ' a las ' + o.hora + '. Si no puedes venir, avísanos por aquí. ¡Gracias!';
+  return saludo(c) + ' (' + centro(o.centro).nombre + '). Te recordamos que mañana, ' + fechaTxt(o.fecha) + ', tienes cita de ' + serv(c) + ' a las ' + o.hora + '. Si no puedes venir, avísanos por aquí para liberar la hora. ¡Hasta mañana!';
+}
+function textoAgradecimiento(c, o){
+  var web = location.origin + location.pathname + '#reservar', res = (CONFIG.resenas || {})[o.centro];
+  var n = String(c.nombre || '').trim().split(' ')[0];
+  return 'Hola' + (n ? ' ' + n : '') + ', gracias por confiar en Valênia Simões. Esperamos que hayas disfrutado de tu sesión de ' + serv(c) + '. Cuando quieras volver, puedes reservar tu próxima cita aquí: ' + web +
+    '\n\nY si te ha gustado, nos ayudaría mucho que nos dejaras una reseña en Google' + (res ? ': ' + res : '') + '. ¡Hasta pronto!';
 }
 function textoCambio(c, o){
-  return saludo(c) + ' (' + centro(o.centro).nombre + '). Hemos cambiado tu cita de ' + c.servicio + ': ahora es el ' + fechaTxt(o.fecha) + ' a las ' + o.hora + '. Si no te viene bien, contéstanos por aquí. ¡Gracias!';
+  return saludo(c) + ' (' + centro(o.centro).nombre + '). Hemos cambiado tu cita de ' + serv(c) + ': ahora es el ' + fechaTxt(o.fecha) + ' a las ' + o.hora + '. Si no te viene bien, contéstanos por aquí. ¡Gracias!';
 }
 function textoAnulacion(c, o){
-  return saludo(c) + ' (' + centro(o.centro).nombre + '). Tu cita de ' + c.servicio + ' del ' + fechaTxt(o.fecha) + ' a las ' + o.hora + ' ha quedado anulada. Si quieres buscar otro día, contéstanos por aquí o reserva en nuestra web. ¡Gracias!';
+  return saludo(c) + ' (' + centro(o.centro).nombre + '). Tu cita de ' + serv(c) + ' del ' + fechaTxt(o.fecha) + ' a las ' + o.hora + ' ha quedado anulada. Si quieres buscar otro día, contéstanos por aquí o reserva en nuestra web. ¡Gracias!';
 }
 
 /* ---------- cambiar día u hora ---------- */
