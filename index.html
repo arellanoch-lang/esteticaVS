@@ -297,7 +297,8 @@ input[aria-invalid="true"]{border-color:#B03A6F}
 .modal-sub{font-size:.9rem;color:var(--texto-suave)}
 .modal-form{padding:0;gap:14px}
 .modal-dl{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:4px 0;font-size:.92rem}
-.modal-acciones{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.modal-acciones{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;align-items:center}
+#m-anular{color:#B03A6F}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -820,6 +821,15 @@ function DemoStore(){
       guardar(); return Promise.resolve(id);
     },
     liberar: function(id){ delete data.ocupado[id]; delete data.citas[id]; guardar(); return Promise.resolve(); },
+    mover: function(idViejo, n){
+      var nid = slotId(n.fecha, n.hora, n.prof);
+      if (data.ocupado[nid]) return Promise.reject(errOcupado());
+      var campos = { centro: n.centro, fecha: n.fecha, hora: n.hora, prof: n.prof };
+      var o = Object.assign({}, data.ocupado[idViejo], campos), c = Object.assign({}, data.citas[idViejo] || {}, campos);
+      delete data.ocupado[idViejo]; delete data.citas[idViejo];
+      data.ocupado[nid] = o; data.citas[nid] = c; guardar();
+      return Promise.resolve(nid);
+    },
     suscribirDia: function(fecha, fn){
       var s = { fecha: fecha, fn: fn }; subs.push(s); fn(dia(fecha));
       return function(){ subs = subs.filter(function(x){ return x !== s; }); };
@@ -868,6 +878,22 @@ function FirebaseStore(cfg){
     },
     liberar: function(id){
       return listo.then(function(x){ var b = x.db.batch(); b.delete(x.db.collection('ocupado').doc(id)); b.delete(x.db.collection('citas').doc(id)); return b.commit(); });
+    },
+    mover: function(idViejo, n){
+      return listo.then(function(x){
+        var nid = slotId(n.fecha, n.hora, n.prof);
+        var oN = x.db.collection('ocupado').doc(nid), cN = x.db.collection('citas').doc(nid);
+        var oV = x.db.collection('ocupado').doc(idViejo), cV = x.db.collection('citas').doc(idViejo);
+        return x.db.runTransaction(function(tx){
+          return Promise.all([tx.get(oN), tx.get(cV)]).then(function(r){
+            if (r[0].exists) throw errOcupado();
+            var campos = { centro: n.centro, fecha: n.fecha, hora: n.hora, prof: n.prof };
+            tx.set(oN, Object.assign({ tipo: 'cita' }, campos));
+            tx.set(cN, Object.assign({}, r[1].exists ? r[1].data() : {}, campos));
+            tx.delete(oV); tx.delete(cV);
+          });
+        }).then(function(){ return nid; });
+      });
     },
     suscribirDia: function(fecha, fn){
       var oc = [], ci = {}, fin = [], vivo = true;
@@ -1208,16 +1234,108 @@ function modalOcupado(id){
     return;
   }
   c = c || {};
+  var wa = waLink(c.telefono, textoRecordatorio(c, o));
   abrirModal(cabModal(c.nombre || 'Cita', o.hora + ' · ' + p.nombre + ' · ' + centro(o.centro).nombre) +
     '<dl class="modal-dl"><dt>Tratamiento</dt><dd>' + esc(c.servicio) + '</dd><dt>Teléfono</dt><dd>' + esc(c.telefono || '—') + '</dd>' +
     (c.notas ? '<dt>Comentarios</dt><dd>' + esc(c.notas) + '</dd>' : '') +
     '<dt>Reservada</dt><dd>' + (c.origen === 'clinica' ? 'Por la clínica' : 'Desde la web') + '</dd></dl>' +
-    '<div class="modal-acciones" id="m-acc"><button class="btn btn-linea" type="button" id="m-anular">Anular cita</button></div>');
+    '<div class="modal-acciones" id="m-acc">' +
+      '<button class="btn btn-lotus" type="button" id="m-mover">Cambiar día u hora</button>' +
+      (wa ? '<a class="btn btn-linea" href="' + wa + '" target="_blank" rel="noopener">Enviar WhatsApp</a>' : '') +
+      '<button class="btn-texto" type="button" id="m-anular">Anular cita</button>' +
+    '</div>' + (wa ? '' : '<p class="modal-sub">Sin teléfono válido para WhatsApp.</p>'));
+  $('m-mover').addEventListener('click', function(){ modalMover(id); });
   $('m-anular').addEventListener('click', function(){
     $('m-acc').innerHTML = '<p class="modal-sub" style="width:100%">¿Seguro? La hora volverá a quedar libre en la web.</p><button class="btn btn-lotus" type="button" id="m-si">Sí, anular</button><button class="btn btn-linea" type="button" id="m-no">No</button>';
     $('m-si').focus();
-    $('m-si').addEventListener('click', function(){ store.liberar(id).then(cerrarModal); });
+    $('m-si').addEventListener('click', function(){
+      this.disabled = true;
+      store.liberar(id).then(function(){
+        var aviso = waLink(c.telefono, textoAnulacion(c, o));
+        $('modal-cuerpo').innerHTML = cabModal('Cita anulada', o.hora + ' · ' + fechaTxt(o.fecha)) +
+          '<p class="modal-sub">La hora vuelve a estar libre en la web.' + (aviso ? ' Si quieres, avisa a la clienta.' : '') + '</p>' +
+          '<div class="modal-acciones">' + (aviso ? '<a class="btn btn-lotus" href="' + aviso + '" target="_blank" rel="noopener">Avisar por WhatsApp</a>' : '') +
+          '<button class="btn btn-linea" type="button" id="m-fin">Cerrar</button></div>';
+        $('m-fin').addEventListener('click', cerrarModal); $('m-fin').focus();
+      });
+    });
     $('m-no').addEventListener('click', cerrarModal);
+  });
+}
+
+/* ---------- WhatsApp ---------- */
+function waLink(tel, texto){
+  var d = String(tel || '').replace(/\D/g, '');
+  if (d.indexOf('00') === 0) d = d.slice(2);
+  if (d.length === 9) d = '34' + d;
+  if (d.length < 11) return null;
+  return 'https://wa.me/' + d + '?text=' + encodeURIComponent(texto);
+}
+function saludo(c){ var n = String(c.nombre || '').trim().split(' ')[0]; return 'Hola' + (n ? ' ' + n : '') + ', te escribimos de Valênia Simões'; }
+function textoRecordatorio(c, o){
+  return saludo(c) + ' (' + centro(o.centro).nombre + '). Te recordamos tu cita de ' + c.servicio + ' el ' + fechaTxt(o.fecha) + ' a las ' + o.hora + '. Si no puedes venir, avísanos por aquí. ¡Gracias!';
+}
+function textoCambio(c, o){
+  return saludo(c) + ' (' + centro(o.centro).nombre + '). Hemos cambiado tu cita de ' + c.servicio + ': ahora es el ' + fechaTxt(o.fecha) + ' a las ' + o.hora + '. Si no te viene bien, contéstanos por aquí. ¡Gracias!';
+}
+function textoAnulacion(c, o){
+  return saludo(c) + ' (' + centro(o.centro).nombre + '). Tu cita de ' + c.servicio + ' del ' + fechaTxt(o.fecha) + ' a las ' + o.hora + ' ha quedado anulada. Si quieres buscar otro día, contéstanos por aquí o reserva en nuestra web. ¡Gracias!';
+}
+
+/* ---------- cambiar día u hora ---------- */
+function modalMover(id){
+  var o = mapaOcupado()[id]; if (!o) return;
+  var c = P.datos.citas[id] || {};
+  abrirModal(cabModal('Cambiar día u hora', (c.nombre || 'Cita') + ' · ' + centro(o.centro).nombre) +
+    '<form id="f-mover" class="modal-form" novalidate>' +
+    '<p class="modal-sub">Ahora: ' + esc(fechaTxt(o.fecha)) + ', ' + esc(o.hora) + ' · ' + esc(prof(o.prof).nombre) + '</p>' +
+    '<div class="campo"><label for="mv-fecha">Nuevo día</label><input type="date" id="mv-fecha" min="' + ymd(new Date()) + '" value="' + o.fecha + '"></div>' +
+    '<div class="campo"><label for="mv-hueco">Nueva hora y profesional</label><select id="mv-hueco"></select></div>' +
+    '<p class="aviso" id="mv-aviso" role="alert"></p>' +
+    '<div class="modal-acciones"><button class="btn btn-lotus" type="submit" id="mv-ok">Guardar cambio</button><button class="btn btn-linea" type="button" id="mv-no">Cancelar</button></div></form>');
+  var pet = 0;
+  function cargar(){
+    var f = $('mv-fecha').value, sel = $('mv-hueco'), n = ++pet;
+    $('mv-aviso').textContent = '';
+    sel.disabled = true; sel.innerHTML = '<option value="">Buscando huecos libres…</option>';
+    if (!f || !abierto(f)) { sel.innerHTML = '<option value="">Ese día la clínica está cerrada</option>'; return; }
+    store.ocupados(f).then(function(oc){
+      if (n !== pet) return;
+      var ocup = {}; oc.forEach(function(x){ ocup[x.id] = true; });
+      var opts = [];
+      CONFIG.horas.forEach(function(h){
+        if (enPasado(f, h)) return;
+        profsDe(o.centro).forEach(function(pp){
+          if (!ocup[slotId(f, h, pp.id)]) opts.push({ v: h + '|' + pp.id, t: h + ' · ' + pp.nombre, misma: pp.id === o.prof });
+        });
+      });
+      if (!opts.length) { sel.innerHTML = '<option value="">No quedan huecos libres ese día</option>'; return; }
+      sel.innerHTML = opts.map(function(x){ return '<option value="' + x.v + '">' + esc(x.t) + '</option>'; }).join('');
+      sel.disabled = false;
+      var pre = opts.filter(function(x){ return x.misma; })[0]; if (pre) sel.value = pre.v;
+    }, function(){ if (n === pet) sel.innerHTML = '<option value="">No se han podido cargar las horas</option>'; });
+  }
+  $('mv-fecha').addEventListener('change', cargar); cargar();
+  $('mv-no').addEventListener('click', cerrarModal);
+  $('f-mover').addEventListener('submit', function(e){
+    e.preventDefault();
+    var v = $('mv-hueco').value, f = $('mv-fecha').value;
+    if (!v) { $('mv-aviso').textContent = 'Elige un día con huecos libres.'; return; }
+    var hora = v.split('|')[0], pid = v.split('|')[1];
+    $('mv-ok').disabled = true;
+    store.mover(id, { centro: o.centro, fecha: f, hora: hora, prof: pid }).then(function(){
+      var nueva = { centro: o.centro, fecha: f, hora: hora };
+      var aviso = waLink(c.telefono, textoCambio(c, nueva));
+      $('modal-cuerpo').innerHTML = cabModal('Cita cambiada', c.nombre || 'Cita') +
+        '<p class="modal-sub">Nueva cita: ' + esc(fechaTxt(f)) + ', ' + esc(hora) + ' · ' + esc(prof(pid).nombre) + '.' + (aviso ? ' Avisa a la clienta del cambio.' : '') + '</p>' +
+        '<div class="modal-acciones">' + (aviso ? '<a class="btn btn-lotus" href="' + aviso + '" target="_blank" rel="noopener">Avisar por WhatsApp</a>' : '') +
+        '<button class="btn btn-linea" type="button" id="mv-fin">Cerrar</button></div>';
+      $('mv-fin').addEventListener('click', cerrarModal); $('mv-fin').focus();
+    }, function(err){
+      $('mv-ok').disabled = false;
+      if (err && err.code === 'ocupado') { $('mv-aviso').textContent = 'Esa hora se acaba de ocupar. Elige otra.'; cargar(); }
+      else $('mv-aviso').textContent = 'No se ha podido guardar el cambio. Revisa la conexión e inténtalo de nuevo.';
+    });
   });
 }
 function confirmarBloqueoDia(pid){
