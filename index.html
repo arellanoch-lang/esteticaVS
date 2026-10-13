@@ -1,0 +1,1239 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Clínica de estética Valênia Simões en Corella y Logroño: tratamientos faciales, corporales, masajes, manicura y micropigmentación. Reserva tu cita online.">
+<title>Valênia Simões</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@300;400;500;600&display=swap">
+</head>
+<body style="margin:0">
+<style>
+/* Layout: página editorial clara, secciones alternas marfil / rosa pálido, fotos con esquinas suaves, texto a la izquierda e imagen a la derecha como en el moodboard */
+:root{
+  --marfil:#FAF7F4; --rosa-palido:#F2DDE5; --rosa-empolvado:#D9A6B5; --lotus:#E56AAE;
+  --taupe:#B8AAA5; --carbon:#333033; --texto-suave:#6E6468; --linea:#E7DCDD; --blanco:#FFFFFF;
+  --lotus-hover:#D1559A;
+  --display:"Cormorant Garamond","Cormorant",Garamond,"Times New Roman",serif;
+  --body:"Manrope","Helvetica Neue",Arial,sans-serif;
+  --radio:14px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{background:var(--marfil);color:var(--carbon);font-family:var(--body);font-size:16px;line-height:1.65;font-weight:400}
+a{color:inherit}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.1;margin:0;text-wrap:balance;color:var(--carbon)}
+p{margin:0}
+.wrap{max-width:1160px;margin:0 auto;padding-inline:clamp(16px,4vw,40px)}
+.eyebrow{font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:var(--texto-suave);font-weight:500}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--body);font-size:.74rem;letter-spacing:.18em;text-transform:uppercase;font-weight:600;padding:14px 26px;border-radius:999px;border:1px solid transparent;text-decoration:none;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+.btn-lotus{background:var(--lotus);color:var(--blanco)}
+.btn-lotus:hover{background:var(--lotus-hover)}
+.btn-linea{background:transparent;color:var(--carbon);border-color:var(--carbon)}
+.btn-linea:hover{background:var(--carbon);color:var(--marfil)}
+:focus-visible{outline:2px solid var(--lotus);outline-offset:3px}
+
+/* Cabecera */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--marfil) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--linea)}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-block:14px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-txt{font-family:var(--display);font-size:1.3rem;line-height:.95;letter-spacing:.06em;text-transform:uppercase;color:var(--rosa-empolvado);font-weight:400}
+.logo svg{width:34px;height:auto;flex:none}
+.menu{display:flex;align-items:center;gap:30px}
+.menu a{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;font-weight:500;color:var(--carbon)}
+.menu a:not(.btn):hover{color:var(--lotus)}
+.menu .btn{padding:11px 20px;color:var(--blanco)}
+.toggle{display:none;background:none;border:0;padding:8px;cursor:pointer;color:var(--carbon)}
+@media (max-width:860px){
+  .toggle{display:block}
+  .menu{position:absolute;left:0;right:0;top:100%;flex-direction:column;align-items:stretch;gap:0;background:var(--marfil);border-bottom:1px solid var(--linea);padding:8px 16px 18px}
+  .menu a:not(.btn){padding:14px 4px;border-bottom:1px solid var(--linea)}
+  .menu .btn{margin-top:14px}
+  .menu:not(.abierto){display:none}
+}
+
+/* Hero */
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:clamp(28px,5vw,64px);align-items:center;padding-block:clamp(40px,7vw,88px)}
+.hero h1{font-size:clamp(2.8rem,6.4vw,5.2rem);font-weight:300;letter-spacing:-.01em}
+.hero h1 span{display:block}
+.hero p{margin-top:24px;max-width:40ch;color:var(--texto-suave);font-size:1.02rem}
+.hero .acciones{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}
+.hero-foto{position:relative}
+.hero-foto img{display:block;width:100%;aspect-ratio:4/3.4;object-fit:cover;object-position:30% 40%;border-radius:var(--radio);max-width:100%}
+.hero-foto .sello{position:absolute;right:-10px;bottom:-22px;background:var(--rosa-palido);border-radius:var(--radio);padding:16px 20px;display:flex;align-items:center;gap:12px;max-width:250px}
+.hero-foto .sello p{font-family:var(--display);font-size:1.15rem;line-height:1.2;font-style:italic}
+.hero-foto .sello svg{width:38px;flex:none}
+@media (max-width:860px){.hero{grid-template-columns:1fr}.hero-foto .sello{right:12px}}
+
+/* Franja de lema */
+.lema{background:var(--rosa-palido);text-align:center;padding-block:clamp(56px,8vw,96px)}
+.lema h2{font-size:clamp(2rem,4.4vw,3.2rem);font-weight:300;max-width:18ch;margin:0 auto}
+.divisor{display:flex;align-items:center;justify-content:center;gap:16px;margin:26px auto 22px;max-width:360px}
+.divisor::before,.divisor::after{content:"";height:1px;flex:1;background:var(--rosa-empolvado)}
+.divisor svg{width:34px}
+.lema .eyebrow{max-width:46ch;margin:0 auto;line-height:1.9}
+
+/* Por qué cuidarse */
+.porque{padding-block:clamp(64px,9vw,112px)}
+.porque-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(20px,3vw,40px);margin-top:44px}
+.porque h2{font-size:clamp(2rem,4vw,3rem);font-weight:300;max-width:20ch;margin-top:14px}
+.razon{border-top:1px solid var(--rosa-empolvado);padding-top:22px;min-width:0}
+.razon svg{width:38px;height:38px;color:var(--lotus)}
+.razon h3{font-size:1.6rem;margin:14px 0 10px}
+.razon p{color:var(--texto-suave);font-size:.95rem}
+@media (max-width:760px){.porque-grid{grid-template-columns:1fr}}
+
+/* Tratamientos */
+.tratamientos{background:var(--blanco);padding-block:clamp(64px,9vw,112px)}
+.cab-seccion{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px}
+.cab-seccion h2{font-size:clamp(2.2rem,4.6vw,3.4rem);font-weight:300;margin-top:14px}
+.cab-seccion p{max-width:42ch;color:var(--texto-suave)}
+.servicios{display:flex;flex-direction:column;gap:clamp(56px,8vw,96px);margin-top:clamp(44px,6vw,72px)}
+.servicio{display:grid;grid-template-columns:1fr 1.1fr;gap:clamp(28px,5vw,64px);align-items:center}
+.servicio:nth-child(even) .servicio-foto{order:2}
+.servicio-foto{min-width:0}
+.servicio-foto img{display:block;width:100%;aspect-ratio:5/4;object-fit:cover;border-radius:var(--radio);max-width:100%}
+.servicio-txt{min-width:0}
+.servicio .zona{display:flex;align-items:center;gap:10px}
+.servicio .zona svg{width:26px;height:26px;color:var(--lotus);flex:none}
+.servicio h3{font-size:clamp(1.9rem,3.4vw,2.6rem);margin:12px 0 16px}
+.servicio .desc{color:var(--texto-suave);max-width:54ch}
+.lista{list-style:none;padding:0;margin:22px 0 0;display:flex;flex-direction:column}
+.lista li{display:grid;grid-template-columns:1fr auto;gap:16px;padding:12px 0;border-bottom:1px solid var(--linea);font-size:.95rem}
+.lista li span:last-child{color:var(--texto-suave);font-size:.82rem;white-space:nowrap}
+.importa{margin-top:22px;background:var(--marfil);border-radius:var(--radio);padding:16px 18px;font-size:.9rem;color:var(--carbon)}
+.importa strong{display:block;font-family:var(--display);font-size:1.2rem;font-weight:500;font-style:italic;margin-bottom:4px;color:var(--carbon)}
+.servicio .btn{margin-top:24px}
+@media (max-width:860px){.servicio{grid-template-columns:1fr}.servicio:nth-child(even) .servicio-foto{order:0}}
+
+/* Sobre mí */
+.sobre{padding-block:clamp(64px,9vw,112px)}
+.sobre-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,72px);align-items:center}
+.sobre-fotos{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;min-width:0}
+.sobre-fotos img{display:block;width:100%;height:100%;object-fit:cover;border-radius:var(--radio);max-width:100%}
+.sobre-fotos img:first-child{aspect-ratio:3/4}
+.sobre-fotos .col{display:grid;gap:14px}
+.sobre-fotos .col img{aspect-ratio:1/1.05}
+.sobre h2{font-size:clamp(2.2rem,4.6vw,3.4rem);font-weight:300;margin:14px 0 22px}
+.sobre p + p{margin-top:16px}
+.sobre .texto p{color:var(--texto-suave);max-width:56ch}
+.firma{font-family:var(--display);font-style:italic;font-size:1.9rem;color:var(--rosa-empolvado);margin-top:26px}
+.valores{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.valores span{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;border:1px solid var(--rosa-empolvado);color:var(--carbon);padding:8px 14px;border-radius:999px}
+@media (max-width:860px){.sobre-grid{grid-template-columns:1fr}}
+
+/* Reservas */
+.reservas{background:var(--rosa-palido);padding-block:clamp(64px,9vw,112px)}
+.reserva-caja{display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(24px,4vw,56px);margin-top:44px;align-items:start}
+.reserva-caja > *{min-width:0}
+.pasos{display:flex;flex-direction:column;gap:18px}
+.paso{display:grid;grid-template-columns:34px 1fr;gap:14px;align-items:start}
+.paso b{width:34px;height:34px;border-radius:50%;background:var(--marfil);display:grid;place-items:center;font-family:var(--display);font-size:1.15rem;font-weight:500;color:var(--lotus)}
+.paso p{font-size:.93rem;color:var(--texto-suave)}
+.paso p strong{display:block;color:var(--carbon);font-weight:600}
+form{background:var(--blanco);border-radius:var(--radio);padding:clamp(20px,3.5vw,36px);display:flex;flex-direction:column;gap:22px;min-width:0}
+.campo{display:flex;flex-direction:column;gap:8px;min-width:0}
+.campo > label,.campo > .etq{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:var(--carbon)}
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:560px){.dos{grid-template-columns:1fr}}
+input,select,textarea{font:inherit;font-size:.95rem;color:var(--carbon);background:var(--marfil);border:1px solid var(--linea);border-radius:10px;padding:12px 14px;width:100%}
+textarea{resize:vertical;min-height:84px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--lotus);box-shadow:0 0 0 3px color-mix(in srgb,var(--lotus) 18%,transparent)}
+.dias{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.dia,.hora{font:inherit;border:1px solid var(--linea);background:var(--marfil);color:var(--carbon);border-radius:12px;cursor:pointer;transition:border-color .15s,background .15s}
+.dia{flex:none;width:62px;padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:2px}
+.dia small{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--texto-suave)}
+.dia strong{font-family:var(--display);font-size:1.5rem;font-weight:500;line-height:1}
+.dia:hover,.hora:hover{border-color:var(--rosa-empolvado)}
+.dia[aria-pressed="true"],.hora[aria-pressed="true"]{background:var(--lotus);border-color:var(--lotus);color:var(--blanco)}
+.dia[aria-pressed="true"] small{color:var(--blanco)}
+.horas{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px}
+.hora{padding:10px 0;font-size:.88rem;font-variant-numeric:tabular-nums}
+.hora:disabled{opacity:.35;cursor:not-allowed;text-decoration:line-through}
+.aviso{font-size:.84rem;color:var(--lotus-hover);min-height:1.2em}
+.resumen{font-size:.88rem;color:var(--texto-suave);border-top:1px solid var(--linea);padding-top:16px}
+.confirmacion{background:var(--blanco);border-radius:var(--radio);padding:clamp(24px,4vw,44px);text-align:center}
+.confirmacion svg{width:52px;margin:0 auto}
+.confirmacion h3{font-size:2.2rem;margin:14px 0 10px}
+.confirmacion p{color:var(--texto-suave);max-width:44ch;margin:0 auto}
+.confirmacion dl{display:grid;grid-template-columns:auto 1fr;gap:8px 18px;text-align:left;max-width:360px;margin:24px auto;font-size:.92rem}
+.confirmacion dt{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--texto-suave);padding-top:3px}
+.confirmacion .btn{margin-top:8px}
+@media (max-width:860px){.reserva-caja{grid-template-columns:1fr}.reserva-info{order:2}}
+
+/* Contacto */
+.contacto{padding-block:clamp(64px,9vw,112px)}
+.contacto-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(20px,3vw,32px);margin-top:44px}
+.dato{border-top:1px solid var(--rosa-empolvado);padding-top:20px;min-width:0}
+.dato h3{font-size:1.55rem;margin-bottom:10px}
+.dato p{color:var(--texto-suave);font-size:.95rem;overflow-wrap:anywhere}
+.dato .grande{font-family:var(--display);font-size:1.6rem;color:var(--carbon);font-variant-numeric:tabular-nums}
+.copiar{margin-top:10px;background:none;border:0;padding:0;font:inherit;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--lotus);cursor:pointer}
+.horario{list-style:none;padding:0;margin:0;font-size:.93rem}
+.horario li{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed var(--linea);font-variant-numeric:tabular-nums}
+.horario li span:first-child{color:var(--carbon)}
+.horario li span:last-child{color:var(--texto-suave);text-align:right}
+.banner-marca{margin-top:clamp(48px,7vw,80px)}
+.banner-marca img{display:block;width:100%;border-radius:var(--radio);max-width:100%}
+@media (max-width:860px){.contacto-grid{grid-template-columns:1fr}}
+
+footer{border-top:1px solid var(--linea);padding-block:28px;font-size:.8rem;color:var(--texto-suave)}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
+
+/* Reserva por pasos */
+.reserva-info{display:flex;flex-direction:column;gap:18px}
+.nota-tel{background:var(--marfil);border-radius:var(--radio);padding:16px 18px;font-size:.9rem;color:var(--texto-suave)}
+.nota-tel strong{display:block;color:var(--carbon);font-weight:600;margin-bottom:4px}
+.nowrap{white-space:nowrap}
+.reserva-card{background:var(--blanco);border-radius:var(--radio);padding:clamp(20px,3.5vw,36px);display:flex;flex-direction:column;gap:22px;min-width:0}
+.demo-aviso{font-size:.78rem;background:var(--rosa-palido);color:var(--carbon);border-radius:999px;padding:6px 14px;align-self:flex-start}
+.progreso{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.progreso li{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--taupe);display:flex;align-items:center;gap:8px}
+.progreso li:not(.cuenta):not(:last-of-type)::after{content:"";width:14px;height:1px;background:var(--linea)}
+.progreso li.actual{color:var(--lotus);font-weight:600}
+.progreso li.hecho button{font:inherit;letter-spacing:inherit;text-transform:inherit;background:none;border:0;padding:6px 0;color:var(--carbon);cursor:pointer;text-decoration:underline;text-decoration-color:var(--rosa-empolvado);text-underline-offset:3px;min-height:32px}
+.progreso li.cuenta{margin-left:auto;color:var(--texto-suave)}
+.progreso li.cuenta::after{display:none}
+@media (max-width:560px){.progreso li:not(.actual):not(.cuenta){display:none}.progreso li.cuenta{margin-left:0}.progreso li.actual::after{display:none}}
+.paso-panel{display:flex;flex-direction:column;gap:18px}
+.paso-titulo{font-size:clamp(1.7rem,3vw,2.1rem);outline:none}
+.opciones{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.opcion{font:inherit;text-align:left;background:var(--marfil);border:1px solid var(--linea);border-radius:12px;padding:16px 18px;cursor:pointer;color:var(--carbon);display:flex;flex-direction:column;gap:4px;min-height:56px;transition:border-color .15s,background .15s}
+.opcion strong{font-weight:600;font-size:.95rem}
+.opcion small{font-size:.8rem;color:var(--texto-suave)}
+.opcion:hover{border-color:var(--rosa-empolvado)}
+.opcion[aria-pressed="true"]{border-color:var(--lotus);background:color-mix(in srgb,var(--lotus) 8%,var(--blanco));box-shadow:inset 0 0 0 1px var(--lotus)}
+.opciones-centro .opcion strong{font-family:var(--display);font-size:1.6rem;font-weight:500}
+.grupo-etq{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:var(--texto-suave);margin:14px 0 8px}
+.grupo-etq:first-child{margin-top:0}
+.estado-horas{font-size:.86rem;color:var(--texto-suave);min-height:1.3em}
+.horas[aria-busy="true"]{min-height:96px}
+.hora{min-height:44px}
+.paso-nav{border-top:1px solid var(--linea);padding-top:14px}
+.btn-atras{font:inherit;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;background:none;border:0;color:var(--texto-suave);cursor:pointer;padding:10px 0;min-height:44px}
+.btn-atras:hover{color:var(--carbon)}
+#form-reserva{background:none;padding:0;gap:18px}
+.resumen-cita{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;margin:0;background:var(--marfil);border-radius:12px;padding:16px 18px;font-size:.92rem}
+.resumen-cita dt,.confirmacion dt,.modal-dl dt{font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--texto-suave);padding-top:4px}
+.resumen-cita dd,.modal-dl dd{margin:0}
+.error{font-size:.8rem;color:#B03A6F;min-height:0;margin:0}
+.error:empty{display:none}
+input[aria-invalid="true"]{border-color:#B03A6F}
+.conf-nota{font-size:.85rem;margin-top:-4px!important}
+.confirmacion{padding:clamp(8px,2vw,16px) 0}
+.confirmacion dd{margin:0}
+
+/* Teléfono en manicura / micropigmentación */
+.cita-tel{margin-top:24px;border:1px solid var(--rosa-empolvado);border-radius:var(--radio);padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.cita-tel p{font-size:.9rem;color:var(--texto-suave)}
+.cita-tel strong{display:block;font-family:var(--display);font-size:1.3rem;font-weight:500;color:var(--carbon);margin-bottom:2px}
+.cita-tel-num{font-family:var(--display);font-size:1.7rem!important;color:var(--carbon)!important;font-variant-numeric:tabular-nums}
+.cita-tel-acciones{display:flex;flex-wrap:wrap;gap:10px}
+.servicio .cita-tel .btn{margin-top:0;padding:12px 22px}
+.chip-mes{margin-left:6px;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;background:var(--rosa-palido);color:var(--carbon);border-radius:999px;padding:4px 10px}
+.lista li:only-child,.lista li span:only-child{grid-column:1/-1}
+.enlace-mapa{color:var(--lotus);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;font-weight:600;text-decoration:none}
+.contacto-grid{grid-template-columns:repeat(4,1fr)}
+@media (max-width:1000px){.contacto-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.contacto-grid{grid-template-columns:1fr}}
+.acceso{color:var(--texto-suave)}
+
+/* Panel de agenda */
+#panel{min-height:100vh;background:var(--marfil)}
+.panel-cab{border-bottom:1px solid var(--linea);background:var(--blanco)}
+.panel-cab-in{display:flex;align-items:center;gap:20px;padding-block:14px}
+.panel-titulo{font-family:var(--display);font-size:1.6rem;color:var(--carbon);padding-left:20px;border-left:1px solid var(--linea)}
+.panel-usuario{margin-left:auto;display:flex;align-items:center;gap:14px;font-size:.85rem;color:var(--texto-suave);min-width:0}
+.panel-usuario span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-texto{font:inherit;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;background:none;border:0;color:var(--lotus);cursor:pointer;padding:10px 4px;min-height:44px}
+.login{padding-block:clamp(40px,8vw,96px);display:flex;justify-content:center}
+.login-card{background:var(--blanco);border-radius:var(--radio);padding:clamp(24px,4vw,40px);width:100%;max-width:420px;display:flex;flex-direction:column;gap:16px}
+.login-card h2{font-size:2.2rem;font-weight:300}
+.login-card form{padding:0;gap:16px}
+.login-demo{font-size:.84rem;background:var(--rosa-palido);border-radius:10px;padding:10px 14px;color:var(--carbon)}
+.agenda{padding-block:28px 64px;display:flex;flex-direction:column;gap:14px}
+.agenda-barra{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between}
+.segmentado{display:inline-flex;background:var(--blanco);border:1px solid var(--linea);border-radius:999px;padding:4px}
+.segmentado button{font:inherit;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;border:0;background:none;color:var(--texto-suave);padding:10px 18px;border-radius:999px;cursor:pointer;min-height:40px}
+.segmentado button[aria-pressed="true"]{background:var(--lotus);color:var(--blanco)}
+.fecha-nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.btn-icono{font:inherit;font-size:1.4rem;line-height:1;width:44px;height:44px;border-radius:50%;border:1px solid var(--linea);background:var(--blanco);color:var(--carbon);cursor:pointer}
+.fecha-lbl{position:relative;font-family:var(--display);font-size:1.45rem;color:var(--carbon);padding:0 8px;cursor:pointer}
+.fecha-lbl input{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}
+.agenda-resumen{font-size:.9rem;color:var(--texto-suave);font-variant-numeric:tabular-nums}
+.leyenda{display:flex;flex-wrap:wrap;gap:14px;font-size:.78rem;color:var(--texto-suave)}
+.ley{display:inline-flex;align-items:center;gap:6px}
+.ley::before{content:"";width:14px;height:14px;border-radius:4px;border:1px solid var(--linea)}
+.ley-cita::before{background:var(--rosa-palido);border-color:var(--rosa-empolvado)}
+.ley-bloq::before{background:repeating-linear-gradient(45deg,#EFEAE8 0 4px,#E2DAD7 4px 8px)}
+.ley-otro::before{background:#F1EEEC}
+.ley-libre::before{background:var(--blanco)}
+.rejilla-scroll{overflow-x:auto;background:var(--blanco);border-radius:var(--radio);border:1px solid var(--linea)}
+.rejilla{width:100%;min-width:520px;border-collapse:collapse;font-size:.86rem;table-layout:fixed}
+.rejilla th,.rejilla td{border-bottom:1px solid var(--linea);border-left:1px solid var(--linea);padding:4px;vertical-align:top}
+.rejilla thead th{position:sticky;top:0;background:var(--blanco);text-align:left;padding:12px 10px;font-weight:600;font-size:.82rem}
+.rejilla thead th span{display:block}
+.rejilla .col-hora{width:70px;border-left:0;font-variant-numeric:tabular-nums;color:var(--texto-suave);font-weight:500;padding:12px 10px;text-align:left}
+.btn-dia{font:inherit;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--lotus);background:none;border:0;padding:4px 0;cursor:pointer;font-weight:600}
+.celda{height:58px}
+.celda button{font:inherit;width:100%;height:100%;min-height:50px;border-radius:8px;border:1px solid transparent;text-align:left;padding:6px 10px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;gap:2px;overflow:hidden}
+.celda.libre button{background:none;color:var(--taupe);font-size:1.2rem;border:1px dashed transparent;align-items:center}
+.celda.libre button:hover{border-color:var(--rosa-empolvado);color:var(--lotus)}
+.celda.cita button{background:var(--rosa-palido);border-color:var(--rosa-empolvado);color:var(--carbon)}
+.celda.cita strong{font-weight:600;font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.celda.cita small{font-size:.74rem;color:var(--texto-suave);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.celda.bloq button{background:repeating-linear-gradient(45deg,#EFEAE8 0 6px,#E2DAD7 6px 12px);color:var(--texto-suave);font-size:.78rem}
+.celda.otro span,.celda.fuera span{display:flex;align-items:center;height:100%;min-height:50px;padding:6px 10px;border-radius:8px;background:#F1EEEC;color:var(--texto-suave);font-size:.76rem}
+.celda.fuera span{background:none;font-style:italic}
+.celda.pasado{opacity:.55}
+.modal-fondo{position:fixed;inset:0;background:rgba(51,48,51,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal{position:relative;background:var(--blanco);border-radius:var(--radio);padding:28px clamp(20px,4vw,32px);width:100%;max-width:440px;max-height:90vh;overflow:auto;display:flex;flex-direction:column;gap:12px}
+.modal h3{font-size:1.9rem}
+.modal-cerrar{position:absolute;top:10px;right:10px;width:44px;height:44px;border:0;background:none;font-size:1.6rem;color:var(--texto-suave);cursor:pointer;border-radius:50%}
+.modal-sub{font-size:.9rem;color:var(--texto-suave)}
+.modal-form{padding:0;gap:14px}
+.modal-dl{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:4px 0;font-size:.92rem}
+.modal-acciones{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="loto" viewBox="0 0 64 48">
+      <path d="M32 6c6 7 8 15 8 22s-3 12-8 16c-5-4-8-9-8-16s2-15 8-22z" fill="#E56AAE" opacity=".9"/>
+      <path d="M32 44c-7-2-14-7-17-15-2-5-2-10-1-14 7 2 13 7 16 13" fill="#F2A7CC"/>
+      <path d="M32 44c7-2 14-7 17-15 2-5 2-10 1-14-7 2-13 7-16 13" fill="#F2A7CC"/>
+      <path d="M32 44c-9 1-18-2-24-8-3-3-5-7-6-10 7-1 15 1 21 6" fill="#F7C8DD"/>
+      <path d="M32 44c9 1 18-2 24-8 3-3 5-7 6-10-7-1-15 1-21 6" fill="#F7C8DD"/>
+    </symbol>
+    <symbol id="loto-linea" viewBox="0 0 64 48">
+      <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round">
+        <path d="M32 6c6 7 8 15 8 22s-3 12-8 16c-5-4-8-9-8-16s2-15 8-22z"/>
+        <path d="M32 44c-7-2-14-7-17-15-2-5-2-10-1-14 7 2 13 7 16 13"/>
+        <path d="M32 44c7-2 14-7 17-15 2-5 2-10 1-14-7 2-13 7-16 13"/>
+        <path d="M32 44c-9 1-18-2-24-8-3-3-5-7-6-10 7-1 15 1 21 6"/>
+        <path d="M32 44c9 1 18-2 24-8 3-3 5-7 6-10-7-1-15 1-21 6"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="sitio">
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#inicio" aria-label="Valênia Simões, inicio">
+      <span class="logo-txt">Valênia<br>Simões</span>
+      <svg aria-hidden="true" viewBox="0 0 64 48"><use href="#loto"/></svg>
+    </a>
+    <button class="toggle" id="toggle" aria-label="Abrir menú" aria-expanded="false">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <nav class="menu" id="menu">
+      <a href="#inicio">Inicio</a>
+      <a href="#tratamientos">Tratamientos</a>
+      <a href="#sobre-mi">Sobre mí</a>
+      <a href="#contacto">Contacto</a>
+      <a class="btn btn-lotus" href="#reservar">Reservar cita</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="wrap hero" id="inicio">
+    <div>
+      <p class="eyebrow">Clínica de estética · Corella y Logroño</p>
+      <h1 style="margin-top:18px"><span>Tu belleza.</span><span>Tu bienestar.</span><span>Tu momento.</span></h1>
+      <p>Tratamientos faciales, corporales y de belleza diseñados para cuidarte, en un espacio tranquilo donde el tiempo es solo para ti.</p>
+      <div class="acciones">
+        <a class="btn btn-lotus" href="#tratamientos">Descubrir tratamientos</a>
+        <a class="btn btn-linea" href="#reservar">Reservar cita</a>
+      </div>
+    </div>
+    <div class="hero-foto">
+      <img src="img/mujer.jpg" alt="Retrato en blanco y negro de una mujer con la mano apoyada en el cuello">
+      <div class="sello">
+        <svg aria-hidden="true" viewBox="0 0 64 48"><use href="#loto"/></svg>
+        <p>Cuidarte también es una forma de quererte.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="lema">
+    <div class="wrap">
+      <h2>Tu bienestar también es una forma de cuidarte.</h2>
+      <div class="divisor"><svg aria-hidden="true" viewBox="0 0 64 48"><use href="#loto"/></svg></div>
+      <p class="eyebrow">Tratamientos faciales, corporales y de belleza pensados para ti</p>
+    </div>
+  </section>
+
+  <section class="wrap porque">
+    <p class="eyebrow">La importancia de cuidarse</p>
+    <h2>Pequeños cuidados constantes que se notan por dentro y por fuera</h2>
+    <div class="porque-grid">
+      <div class="razon">
+        <svg aria-hidden="true" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="8"/></svg>
+        <h3>Una piel que respira</h3>
+        <p>La piel se renueva constantemente. Una limpieza profesional elimina impurezas y células muertas que la rutina de casa no alcanza, y prepara el cutis para aprovechar mejor tus cosméticos.</p>
+      </div>
+      <div class="razon">
+        <svg aria-hidden="true" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 14c4-4 8-4 12 0s8 4 12 0 8-4 8-4M4 21c4-4 8-4 12 0s8 4 12 0 8-4 8-4M4 28c4-4 8-4 12 0s8 4 12 0 8-4 8-4"/></svg>
+        <h3>Circulación y ligereza</h3>
+        <p>Los drenajes y la presoterapia estimulan el sistema linfático, ayudan a reducir la retención de líquidos y alivian la sensación de piernas cansadas.</p>
+      </div>
+      <div class="razon">
+        <svg aria-hidden="true" viewBox="0 0 64 48"><use href="#loto-linea"/></svg>
+        <h3>Un momento para ti</h3>
+        <p>Dedicarte una hora sin prisas reduce el estrés y mejora cómo te sientes contigo misma. El bienestar emocional también forma parte del cuidado.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="tratamientos" id="tratamientos">
+    <div class="wrap">
+      <div class="cab-seccion">
+        <div>
+          <p class="eyebrow">Tratamientos</p>
+          <h2>Cuidados pensados para cada necesidad</h2>
+        </div>
+        <p>Cada tratamiento empieza con una valoración personal para elegir la técnica adecuada a tu piel, tu cuerpo y tus objetivos.</p>
+      </div>
+
+      <div class="servicios">
+        <article class="servicio" id="facial">
+          <div class="servicio-foto"><img src="img/radiofrecuencia.jpg" alt="Tratamiento facial de radiofrecuencia en cabina" loading="lazy"></div>
+          <div class="servicio-txt">
+            <div class="zona"><svg aria-hidden="true" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.3"><ellipse cx="20" cy="18" rx="10" ry="12"/><path d="M15 16h2M23 16h2M17 24c2 1.5 4 1.5 6 0M12 30c-1 4-4 6-6 7M28 30c1 4 4 6 6 7"/></svg><span class="eyebrow">Facial</span></div>
+            <h3>Limpieza de cutis con aspirador y radiofrecuencia</h3>
+            <p class="desc">Limpieza profunda en varias fases: desmaquillado, exfoliación, extracción con aspirador facial y un cierre con radiofrecuencia que calienta suavemente las capas profundas de la piel para estimular el colágeno. La piel queda limpia, luminosa y más firme.</p>
+            <ul class="lista">
+              <li><span>Limpieza facial profunda</span><span>Aprox. 60 min</span></li>
+              <li><span>Radiofrecuencia facial reafirmante</span><span>Aprox. 60 min</span></li>
+            </ul>
+            <div class="importa"><strong>Por qué es importante</strong>Los poros obstruidos favorecen puntos negros e imperfecciones. Una limpieza profesional periódica mantiene la piel sana y retrasa la pérdida de firmeza.</div>
+            <a class="btn btn-linea" href="#reservar" data-servicio="Limpieza facial profunda">Reservar este tratamiento</a>
+          </div>
+        </article>
+
+        <article class="servicio" id="corporal">
+          <div class="servicio-foto"><img src="img/cavitacion.jpg" alt="Tratamiento corporal con aparatología sobre la espalda" loading="lazy"></div>
+          <div class="servicio-txt">
+            <div class="zona"><svg aria-hidden="true" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M20 4v32M13 9l14 22M27 9L13 31M6 20h28"/><circle cx="20" cy="20" r="4"/></svg><span class="eyebrow">Corporal remodelante</span></div>
+            <h3>Criolipólisis, radiofrecuencia INDIBA, electroestimulación y presoterapia</h3>
+            <p class="desc">Tecnología para esculpir la silueta sin cirugía. La criolipólisis aplica frío controlado sobre la grasa localizada; la radiofrecuencia INDIBA calienta los tejidos en profundidad para reafirmar la piel y mejorar su textura; la electroestimulación tonifica el músculo y la presoterapia activa la circulación con presión secuencial.</p>
+            <ul class="lista">
+              <li><span>Criolipólisis reafirmante</span><span>Aprox. 60 min</span></li>
+              <li><span>Radiofrecuencia INDIBA</span><span>Aprox. 60 min</span></li>
+              <li><span>Electroestimulación</span><span>Aprox. 60 min</span></li>
+              <li><span>Presoterapia</span><span>Aprox. 60 min</span></li>
+            </ul>
+            <div class="importa"><strong>Por qué es importante</strong>La grasa localizada y la flacidez a veces no responden solo a la dieta y el ejercicio. Combinar estas técnicas con hábitos saludables ayuda a conseguir resultados visibles y duraderos.</div>
+            <a class="btn btn-linea" href="#reservar" data-servicio="Radiofrecuencia INDIBA">Reservar este tratamiento</a>
+          </div>
+        </article>
+
+        <article class="servicio" id="masajes">
+          <div class="servicio-foto"><img src="img/drenaje.jpg" alt="Esteticista realizando un masaje de drenaje en la pierna de una clienta" loading="lazy"></div>
+          <div class="servicio-txt">
+            <div class="zona"><svg aria-hidden="true" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 14c4-4 8-4 12 0s8 4 12 0 8-4 8-4M4 21c4-4 8-4 12 0s8 4 12 0 8-4 8-4M4 28c4-4 8-4 12 0s8 4 12 0 8-4 8-4"/></svg><span class="eyebrow">Masajes y drenaje</span></div>
+            <h3>Drenaje linfático, masaje modelador manual y anticelulítico</h3>
+            <p class="desc">Técnicas manuales con ritmos y presiones distintas según el objetivo. El drenaje linfático, suave y rítmico, favorece la eliminación de líquidos. El masaje modelador, totalmente manual, trabaja el contorno con maniobras más intensas, y el anticelulítico actúa sobre la piel de naranja y mejora su textura.</p>
+            <ul class="lista">
+              <li><span>Drenaje linfático manual</span><span>Aprox. 60 min</span></li>
+              <li><span>Masaje modelador manual</span><span>Aprox. 60 min</span></li>
+              <li><span>Tratamiento anticelulítico</span><span>Aprox. 60 min</span></li>
+            </ul>
+            <div class="importa"><strong>Por qué es importante</strong>Un sistema linfático activo reduce la hinchazón y la pesadez, y mejora el aspecto de la piel. Además, el masaje es una de las formas más eficaces de liberar tensión.</div>
+            <a class="btn btn-linea" href="#reservar" data-servicio="Drenaje linfático manual">Reservar este tratamiento</a>
+          </div>
+        </article>
+
+        <article class="servicio" id="manos">
+          <div class="servicio-foto"><img src="img/unas.jpg" alt="Manos con manicura en tono rosa suave" loading="lazy"></div>
+          <div class="servicio-txt">
+            <div class="zona"><svg aria-hidden="true" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 36V14a3 3 0 016 0v10M18 22V8a3 3 0 016 0v14M24 20V11a3 3 0 016 0v17c0 5-3 8-8 8h-4"/></svg><span class="eyebrow">Belleza de manos y pies</span></div>
+            <h3>Manicura y pedicura</h3>
+            <p class="desc">Hacemos manicuras simples, semipermanentes y de gel acrílico, siempre con un cuidado completo de uñas y cutículas. En pedicura incluimos el tratamiento de durezas para unos pies suaves y cuidados.</p>
+            <ul class="lista">
+              <li><span>Manicura simple</span></li>
+              <li><span>Manicura semipermanente</span></li>
+              <li><span>Gel acrílico</span></li>
+              <li><span>Pedicura</span></li>
+            </ul>
+            <div class="importa"><strong>Por qué es importante</strong>Unas uñas y cutículas bien cuidadas son más fuertes y evitan pequeñas lesiones e infecciones. Unos pies atendidos con regularidad previenen durezas y molestias al caminar.</div>
+            <div class="cita-tel">
+              <p><strong>Citas por teléfono</strong>Las citas de manicura y pedicura se dan por teléfono o WhatsApp.</p>
+              <p class="cita-tel-num">+34 638 17 70 78</p>
+              <div class="cita-tel-acciones"><a class="btn btn-lotus" href="tel:+34638177078">Llamar</a><a class="btn btn-linea" href="https://wa.me/34638177078" target="_blank" rel="noopener">WhatsApp</a></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="servicio" id="mirada">
+          <div class="servicio-foto"><img src="img/cejas.jpg" alt="Primer plano de ojo y ceja definida" loading="lazy"></div>
+          <div class="servicio-txt">
+            <div class="zona"><svg aria-hidden="true" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 21c5-7 11-10 17-10s12 3 17 10c-5 7-11 10-17 10S8 28 3 21z"/><circle cx="20" cy="21" r="5"/><path d="M6 10c6-4 14-5 22-2"/></svg><span class="eyebrow">Mirada</span><span class="chip-mes">Una vez al mes</span></div>
+            <h3>Micropigmentación y cejas 3D</h3>
+            <p class="desc">Diseño de cejas personalizado según la forma de tu rostro. La micropigmentación introduce pigmento en la capa superficial de la piel para definir y rellenar; la técnica de cejas 3D dibuja trazos pelo a pelo para un resultado natural. Es un servicio que ofrecemos una vez al mes.</p>
+            <ul class="lista">
+              <li><span>Micropigmentación de cejas</span><span>Con retoque</span></li>
+              <li><span>Cejas 3D pelo a pelo</span><span>Con retoque</span></li>
+            </ul>
+            <div class="importa"><strong>Por qué es importante</strong>Las cejas enmarcan la mirada y equilibran las facciones. Un diseño bien hecho ahorra tiempo de maquillaje cada día y aporta seguridad.</div>
+            <div class="cita-tel">
+              <p><strong>Información y citas por teléfono</strong>Llámanos para conocer la próxima fecha y reservar tu plaza.</p>
+              <p class="cita-tel-num">+34 638 17 70 78</p>
+              <div class="cita-tel-acciones"><a class="btn btn-lotus" href="tel:+34638177078">Llamar</a><a class="btn btn-linea" href="https://wa.me/34638177078" target="_blank" rel="noopener">WhatsApp</a></div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap sobre" id="sobre-mi">
+    <div class="sobre-grid">
+      <div class="sobre-fotos">
+        <img src="img/valenia.jpg" alt="Valênia Simões, responsable de la clínica" style="object-position:55% 40%">
+        <div class="col">
+          <img src="img/recepcion.jpg" alt="Recepción de la clínica con el logotipo en la pared" loading="lazy" style="object-position:62% 50%">
+          <img src="img/spa.jpg" alt="Rincón decorativo con flores rosas, toallas y vela" loading="lazy">
+        </div>
+      </div>
+      <div class="texto">
+        <p class="eyebrow">Sobre mí</p>
+        <h2>Hola, soy Valênia</h2>
+        <p>Creé esta clínica con una idea sencilla: que cada persona que cruza la puerta se sienta escuchada y cuidada. Aquí no hay tratamientos en serie; cada sesión empieza por conocerte, entender qué necesita tu piel o tu cuerpo y explicarte con claridad qué podemos conseguir.</p>
+        <p>Trabajo combinando técnicas manuales con aparatología actual, siempre con productos de calidad y protocolos de higiene rigurosos. Me formo de manera continua para ofrecerte tratamientos seguros y eficaces.</p>
+        <p>Hoy somos un equipo de seis profesionales, tres en Corella y tres en Logroño, y en los dos centros te atendemos con el mismo horario.</p>
+        <p>Mi objetivo es que salgas de aquí sintiéndote mejor que cuando llegaste.</p>
+        <div class="valores"><span>Atención personal</span><span>Resultados naturales</span><span>Espacio tranquilo</span><span>Corella y Logroño</span></div>
+        <p class="firma">Valênia Simões</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="reservas" id="reservar">
+    <div class="wrap">
+      <div class="cab-seccion">
+        <div>
+          <p class="eyebrow">Cita online</p>
+          <h2>Reserva tu momento</h2>
+        </div>
+        <p>Elige centro, tratamiento, día y hora. La hora queda reservada para ti al momento.</p>
+      </div>
+
+      <div class="reserva-caja">
+        <aside class="reserva-info">
+          <div class="paso"><b>1</b><p><strong>Centro y tratamiento</strong>Atendemos en Corella y en Logroño, con el mismo horario.</p></div>
+          <div class="paso"><b>2</b><p><strong>Día y hora</strong>Solo verás las horas libres. Cada sesión dura unos 60 minutos.</p></div>
+          <div class="paso"><b>3</b><p><strong>Tus datos</strong>Al confirmar, la hora queda bloqueada a tu nombre.</p></div>
+          <div class="nota-tel">
+            <p><strong>Manicura, pedicura y micropigmentación</strong>Estos servicios no se reservan online. Llámanos o escríbenos por WhatsApp al <span class="nowrap">+34 638 17 70 78</span>.</p>
+          </div>
+        </aside>
+
+        <div class="reserva-card" id="reserva-card">
+          <p class="demo-aviso" id="demo-aviso" hidden>Modo demostración: las reservas se guardan solo en este navegador.</p>
+          <ol class="progreso" id="progreso" aria-label="Pasos de la reserva"></ol>
+
+          <div class="paso-panel" data-paso="1">
+            <h3 class="paso-titulo" tabindex="-1">¿En qué centro?</h3>
+            <div class="opciones opciones-centro" id="op-centro"></div>
+          </div>
+
+          <div class="paso-panel" data-paso="2" hidden>
+            <h3 class="paso-titulo" tabindex="-1">Elige el tratamiento</h3>
+            <div id="op-servicio"></div>
+          </div>
+
+          <div class="paso-panel" data-paso="3" hidden>
+            <h3 class="paso-titulo" tabindex="-1">Día y hora</h3>
+            <div class="campo">
+              <span class="etq" id="etq-dia">Día</span>
+              <div class="dias" id="dias" role="group" aria-labelledby="etq-dia"></div>
+            </div>
+            <div class="campo">
+              <span class="etq" id="etq-hora">Hora</span>
+              <p class="estado-horas" id="estado-horas" aria-live="polite"></p>
+              <div class="horas" id="horas" role="group" aria-labelledby="etq-hora"></div>
+            </div>
+          </div>
+
+          <div class="paso-panel" data-paso="4" hidden>
+            <h3 class="paso-titulo" tabindex="-1">Tus datos</h3>
+            <form id="form-reserva" novalidate>
+              <dl class="resumen-cita" id="resumen-cita"></dl>
+              <div class="dos">
+                <div class="campo"><label for="nombre">Nombre y apellido</label><input id="nombre" autocomplete="name" required aria-describedby="nombre-error"><p class="error" id="nombre-error"></p></div>
+                <div class="campo"><label for="telefono">Teléfono</label><input id="telefono" type="tel" autocomplete="tel" inputmode="tel" required aria-describedby="telefono-error"><p class="error" id="telefono-error"></p></div>
+              </div>
+              <div class="campo"><label for="notas">Comentarios (opcional)</label><textarea id="notas" placeholder="Cuéntanos si es tu primera visita o si tienes alguna preferencia"></textarea></div>
+              <p class="aviso" id="aviso" role="alert"></p>
+              <button class="btn btn-lotus" type="submit" id="btn-confirmar">Confirmar cita</button>
+            </form>
+          </div>
+
+          <div class="paso-nav" id="paso-nav"><button class="btn-atras" type="button" id="btn-atras">← Atrás</button></div>
+
+          <div class="confirmacion" id="confirmacion" hidden>
+            <svg aria-hidden="true" viewBox="0 0 64 48"><use href="#loto"/></svg>
+            <h3 tabindex="-1" id="conf-titulo">Cita reservada</h3>
+            <p>Gracias, <span id="c-nombre"></span>. Te esperamos.</p>
+            <dl id="c-detalle"></dl>
+            <p class="conf-nota">Si no puedes venir, avísanos llamando al <span class="nowrap">+34 638 17 70 78</span> para liberar la hora.</p>
+            <button class="btn btn-linea" type="button" id="otra">Reservar otra cita</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap contacto" id="contacto">
+    <p class="eyebrow">Contacto</p>
+    <h2 style="font-size:clamp(2.2rem,4.6vw,3.4rem);font-weight:300;margin-top:14px">Te esperamos</h2>
+    <div class="contacto-grid">
+      <div class="dato">
+        <h3>Corella</h3>
+        <p class="grande" style="font-size:1.35rem">Calle María Teresa Sáenz de Heredia, 39</p>
+        <p>31591 Corella, Navarra</p>
+        <p style="margin-top:12px"><a class="enlace-mapa" href="https://www.google.com/maps/search/?api=1&query=Calle+Mar%C3%ADa+Teresa+S%C3%A1enz+de+Heredia+39+31591+Corella+Navarra" target="_blank" rel="noopener">Ver en el mapa</a></p>
+      </div>
+      <div class="dato">
+        <h3>Logroño</h3>
+        <p class="grande" style="font-size:1.35rem">Calle Vara de Rey, 48</p>
+        <p>Logroño, La Rioja</p>
+        <p style="margin-top:12px"><a class="enlace-mapa" href="https://www.google.com/maps/search/?api=1&query=Calle+Vara+de+Rey+48+Logro%C3%B1o" target="_blank" rel="noopener">Ver en el mapa</a></p>
+      </div>
+      <div class="dato">
+        <h3>Teléfono y WhatsApp</h3>
+        <p class="grande" id="tel-txt">+34 638 17 70 78</p>
+        <p>Para los dos centros</p>
+        <p><a href="https://www.instagram.com/clinicaestetica_valenia/" target="_blank" rel="noopener" style="color:var(--carbon)">@clinicaestetica_valenia</a></p>
+        <button class="copiar" type="button" id="copiar">Copiar teléfono</button>
+      </div>
+      <div class="dato">
+        <h3>Horario</h3>
+        <ul class="horario">
+          <li><span>Lunes a viernes</span><span>9:00 – 20:00</span></li>
+          <li><span>Sábados y domingos</span><span>Cerrado</span></li>
+        </ul>
+        <p style="margin-top:10px;font-size:.85rem">Mismo horario en Corella y Logroño.</p>
+      </div>
+    </div>
+    <div class="banner-marca"><img src="img/banner.jpg" alt="Valênia Simões, clínica de estética" loading="lazy"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Valênia Simões · Clínica de estética</span>
+    <span>Aviso legal · Política de privacidad · <a href="#agenda" class="acceso">Acceso clínica</a></span>
+  </div>
+</footer>
+</div>
+
+<!-- ============ AGENDA PRIVADA DE LA CLÍNICA ============ -->
+<div id="panel" hidden>
+  <header class="panel-cab">
+    <div class="wrap panel-cab-in">
+      <a class="logo" href="#inicio" aria-label="Volver a la web">
+        <span class="logo-txt">Valênia<br>Simões</span>
+        <svg aria-hidden="true" viewBox="0 0 64 48"><use href="#loto"/></svg>
+      </a>
+      <p class="panel-titulo">Agenda</p>
+      <div class="panel-usuario" id="panel-usuario" hidden><span id="usuario-email"></span><button class="btn-texto" type="button" id="btn-salir">Salir</button></div>
+    </div>
+  </header>
+
+  <section class="wrap login" id="login">
+    <div class="login-card">
+      <svg aria-hidden="true" viewBox="0 0 64 48" style="width:48px"><use href="#loto"/></svg>
+      <h2>Acceso de la clínica</h2>
+      <p class="login-demo" id="login-demo" hidden>Modo demostración: entra con cualquier email y contraseña.</p>
+      <form id="form-login" novalidate>
+        <div class="campo"><label for="login-email">Email</label><input id="login-email" type="email" autocomplete="username" required></div>
+        <div class="campo"><label for="login-pass">Contraseña</label><input id="login-pass" type="password" autocomplete="current-password" required></div>
+        <p class="aviso" id="login-aviso" role="alert"></p>
+        <button class="btn btn-lotus" type="submit">Entrar</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="wrap agenda" id="agenda-vista" hidden>
+    <div class="agenda-barra">
+      <div class="segmentado" role="group" aria-label="Centro" id="seg-centro"></div>
+      <div class="fecha-nav">
+        <button class="btn-icono" type="button" id="dia-ant" aria-label="Día anterior">‹</button>
+        <label class="fecha-lbl"><span id="fecha-txt"></span><input type="date" id="fecha-input" aria-label="Elegir fecha"></label>
+        <button class="btn-icono" type="button" id="dia-sig" aria-label="Día siguiente">›</button>
+        <button class="btn-texto" type="button" id="dia-hoy">Hoy</button>
+      </div>
+    </div>
+    <p class="agenda-resumen" id="agenda-resumen" aria-live="polite"></p>
+    <div class="leyenda"><span class="ley ley-cita">Cita</span><span class="ley ley-bloq">Bloqueado</span><span class="ley ley-libre">Libre</span></div>
+    <div class="rejilla-scroll"><table class="rejilla" id="rejilla"></table></div>
+  </section>
+
+  <div class="modal-fondo" id="modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+      <button class="modal-cerrar" type="button" id="modal-cerrar" aria-label="Cerrar">×</button>
+      <div id="modal-cuerpo"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* =========================================================
+   CONFIGURACIÓN — lo único que hay que tocar para publicar
+   ========================================================= */
+var CONFIG = {apiKey: "AIzaSyDT8DLIrCyjMcgAGZf3NFb4S31lnl275Cs",
+  authDomain: "valenia-agenda.firebaseapp.com",
+  projectId: "valenia-agenda",
+  storageBucket: "valenia-agenda.firebasestorage.app",
+  messagingSenderId: "460354202853",
+  appId: "1:460354202853:web:2bfe1a9cc11dee436ff80c"
+};
+  telefono: '+34 638 17 70 78',
+  centros: [
+    { id: 'corella', nombre: 'Corella', direccion: 'C/ María Teresa Sáenz de Heredia, 39' },
+    { id: 'logrono', nombre: 'Logroño', direccion: 'Calle Vara de Rey, 48' }
+  ],
+  // Profesionales de cada centro (los nombres se ven en la web)
+  profesionales: [
+    { id: 'c1', centro: 'corella', nombre: 'Profesional 1' },
+    { id: 'c2', centro: 'corella', nombre: 'Profesional 2' },
+    { id: 'c3', centro: 'corella', nombre: 'Profesional 3' },
+    { id: 'l1', centro: 'logrono', nombre: 'Profesional 1' },
+    { id: 'l2', centro: 'logrono', nombre: 'Profesional 2' },
+    { id: 'l3', centro: 'logrono', nombre: 'Profesional 3' }
+  ],
+  horas: ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'],
+  diasAbiertos: [1,2,3,4,5],      // lunes a viernes
+  diasReservables: 30,            // cuántos días por delante se puede reservar
+  margenMinutos: 60,              // no se puede reservar con menos de 1 h de antelación
+  // Datos del proyecto de Firebase (vacío = modo demostración)
+  firebase: { apiKey: '', authDomain: '', projectId: '', appId: '' }
+};
+
+var SERVICIOS = [
+  { grupo: 'Facial', items: ['Limpieza facial profunda', 'Radiofrecuencia facial reafirmante'] },
+  { grupo: 'Corporal', items: ['Criolipólisis reafirmante', 'Radiofrecuencia INDIBA', 'Electroestimulación', 'Presoterapia'] },
+  { grupo: 'Masajes', items: ['Drenaje linfático manual', 'Masaje modelador manual', 'Tratamiento anticelulítico'] }
+];
+
+/* ---------- utilidades ---------- */
+var MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+var DIAS_C = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+var DIAS_L = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+function $(id){ return document.getElementById(id); }
+function pad(n){ return (n < 10 ? '0' : '') + n; }
+function ymd(d){ return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()); }
+function parseYmd(s){ var p = s.split('-'); return new Date(+p[0], p[1]-1, +p[2]); }
+function fechaTxt(s){ var d = parseYmd(s); return DIAS_L[d.getDay()] + ' ' + d.getDate() + ' de ' + MESES[d.getMonth()]; }
+function slotId(fecha, hora, prof){ return fecha + '_' + hora + '_' + prof; }
+function esc(t){ return String(t == null ? '' : t).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function centro(id){ return CONFIG.centros.filter(function(c){ return c.id === id; })[0]; }
+function prof(id){ return CONFIG.profesionales.filter(function(p){ return p.id === id; })[0]; }
+function abierto(fecha){ return CONFIG.diasAbiertos.indexOf(parseYmd(fecha).getDay()) >= 0; }
+function trabaja(profId, centroId, fecha){
+  var p = prof(profId);
+  return abierto(fecha) && !!p && p.centro === centroId;
+}
+function profsDe(centroId){ return CONFIG.profesionales.filter(function(p){ return p.centro === centroId; }); }
+function enPasado(fecha, hora){
+  var d = parseYmd(fecha), h = hora.split(':');
+  d.setHours(+h[0], +h[1], 0, 0);
+  return d.getTime() < Date.now() + CONFIG.margenMinutos * 60000;
+}
+function errOcupado(){ var e = new Error('ocupado'); e.code = 'ocupado'; return e; }
+
+/* =========================================================
+   ALMACÉN DE CITAS
+   - Demostración: guarda en este navegador.
+   - Firebase: agenda real compartida (cuando se rellena CONFIG.firebase).
+   Colecciones:
+     ocupado/{fecha_hora_prof}  → público, sin datos personales (para saber qué horas están cogidas)
+     citas/{fecha_hora_prof}    → privado, solo la clínica (nombre, teléfono, tratamiento)
+   ========================================================= */
+function DemoStore(){
+  var KEY = 'vs-agenda-demo-3';
+  var data = null, subs = [], usuario = null, authSubs = [];
+  try { var raw = localStorage.getItem(KEY); if (raw) data = JSON.parse(raw); } catch(e) {}
+  if (!data || !data.ocupado) { data = { ocupado: {}, citas: {} }; sembrar(); }
+
+  function sembrar(){
+    var nombres = ['Laura M.','Ana G.','Marta R.','Isabel P.','Lucía S.','Carmen T.','Sara L.','Elena V.'];
+    var d = new Date(); d.setHours(0,0,0,0); var n = 0, k = 0, todos = [];
+    SERVICIOS.forEach(function(g){ todos = todos.concat(g.items); });
+    while (n < 6) {
+      var f = ymd(d);
+      if (abierto(f)) {
+        for (var i = 0; i < 5; i++) {
+          k++;
+          var c = CONFIG.centros[k % 2].id, h = CONFIG.horas[(k * 3) % CONFIG.horas.length], p = profsDe(c)[k % 3].id;
+          var id = slotId(f, h, p);
+          if (data.ocupado[id]) continue;
+          data.ocupado[id] = { centro: c, fecha: f, hora: h, prof: p, tipo: 'cita' };
+          data.citas[id] = { centro: c, fecha: f, hora: h, prof: p, servicio: todos[k % todos.length], nombre: 'Ejemplo · ' + nombres[k % nombres.length], telefono: '600 000 00' + (k % 10), notas: '', origen: 'web' };
+        }
+        n++;
+      }
+      d.setDate(d.getDate() + 1);
+    }
+  }
+  function guardar(){
+    try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e) {}
+    subs.forEach(function(s){ s.fn(dia(s.fecha)); });
+  }
+  function dia(fecha){
+    var oc = [], ci = {};
+    Object.keys(data.ocupado).forEach(function(id){
+      var o = data.ocupado[id];
+      if (o.fecha === fecha) { var x = Object.assign({ id: id }, o); oc.push(x); if (data.citas[id]) ci[id] = data.citas[id]; }
+    });
+    return { ocupado: oc, citas: ci };
+  }
+  function espera(v){ return new Promise(function(res){ setTimeout(function(){ res(v); }, 250); }); }
+  return {
+    modo: 'demo',
+    ocupados: function(fecha){ return espera(dia(fecha).ocupado); },
+    reservar: function(c){
+      var id = slotId(c.fecha, c.hora, c.prof);
+      return espera().then(function(){
+        if (data.ocupado[id]) throw errOcupado();
+        data.ocupado[id] = { centro: c.centro, fecha: c.fecha, hora: c.hora, prof: c.prof, tipo: 'cita' };
+        data.citas[id] = Object.assign({}, c);
+        guardar(); return id;
+      });
+    },
+    bloquear: function(o){
+      var id = slotId(o.fecha, o.hora, o.prof);
+      if (data.ocupado[id]) return Promise.reject(errOcupado());
+      data.ocupado[id] = { centro: o.centro, fecha: o.fecha, hora: o.hora, prof: o.prof, tipo: 'bloqueo' };
+      guardar(); return Promise.resolve(id);
+    },
+    liberar: function(id){ delete data.ocupado[id]; delete data.citas[id]; guardar(); return Promise.resolve(); },
+    suscribirDia: function(fecha, fn){
+      var s = { fecha: fecha, fn: fn }; subs.push(s); fn(dia(fecha));
+      return function(){ subs = subs.filter(function(x){ return x !== s; }); };
+    },
+    entrar: function(email){ usuario = { email: email || 'demo@clinica' }; authSubs.forEach(function(f){ f(usuario); }); return Promise.resolve(); },
+    salir: function(){ usuario = null; authSubs.forEach(function(f){ f(null); }); return Promise.resolve(); },
+    alCambiarSesion: function(fn){ authSubs.push(fn); fn(usuario); }
+  };
+}
+
+function FirebaseStore(cfg){
+  var V = '10.12.2', base = 'https://www.gstatic.com/firebasejs/' + V + '/';
+  function script(src){ return new Promise(function(res, rej){ var s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
+  var listo = script(base + 'firebase-app-compat.js')
+    .then(function(){ return Promise.all([script(base + 'firebase-auth-compat.js'), script(base + 'firebase-firestore-compat.js')]); })
+    .then(function(){ firebase.initializeApp(cfg); return { db: firebase.firestore(), auth: firebase.auth() }; });
+  function ocupar(x, id, docOcupado, docCita){
+    var refO = x.db.collection('ocupado').doc(id), refC = x.db.collection('citas').doc(id);
+    return x.db.runTransaction(function(tx){
+      return tx.get(refO).then(function(snap){
+        if (snap.exists) throw errOcupado();
+        tx.set(refO, docOcupado);
+        if (docCita) tx.set(refC, docCita);
+      });
+    }).then(function(){ return id; }, function(e){
+      if (e && (e.code === 'ocupado' || e.code === 'permission-denied' || e.code === 'aborted')) throw errOcupado();
+      throw e;
+    });
+  }
+  return {
+    modo: 'firebase',
+    ocupados: function(fecha){
+      return listo.then(function(x){ return x.db.collection('ocupado').where('fecha', '==', fecha).get(); })
+        .then(function(q){ return q.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); }); });
+    },
+    reservar: function(c){
+      return listo.then(function(x){
+        var id = slotId(c.fecha, c.hora, c.prof);
+        return ocupar(x, id,
+          { centro: c.centro, fecha: c.fecha, hora: c.hora, prof: c.prof, tipo: 'cita' },
+          { centro: c.centro, fecha: c.fecha, hora: c.hora, prof: c.prof, servicio: c.servicio, nombre: c.nombre, telefono: c.telefono, notas: c.notas || '', origen: c.origen, creada: firebase.firestore.FieldValue.serverTimestamp() });
+      });
+    },
+    bloquear: function(o){
+      return listo.then(function(x){ return ocupar(x, slotId(o.fecha, o.hora, o.prof), { centro: o.centro, fecha: o.fecha, hora: o.hora, prof: o.prof, tipo: 'bloqueo' }, null); });
+    },
+    liberar: function(id){
+      return listo.then(function(x){ var b = x.db.batch(); b.delete(x.db.collection('ocupado').doc(id)); b.delete(x.db.collection('citas').doc(id)); return b.commit(); });
+    },
+    suscribirDia: function(fecha, fn){
+      var oc = [], ci = {}, fin = [], vivo = true;
+      listo.then(function(x){
+        if (!vivo) return;
+        fin.push(x.db.collection('ocupado').where('fecha', '==', fecha).onSnapshot(function(q){ oc = q.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); }); fn({ ocupado: oc, citas: ci }); }));
+        fin.push(x.db.collection('citas').where('fecha', '==', fecha).onSnapshot(function(q){ ci = {}; q.docs.forEach(function(d){ ci[d.id] = d.data(); }); fn({ ocupado: oc, citas: ci }); }));
+      });
+      return function(){ vivo = false; fin.forEach(function(f){ f(); }); };
+    },
+    entrar: function(email, pass){ return listo.then(function(x){ return x.auth.signInWithEmailAndPassword(email, pass); }); },
+    salir: function(){ return listo.then(function(x){ return x.auth.signOut(); }); },
+    alCambiarSesion: function(fn){ listo.then(function(x){ x.auth.onAuthStateChanged(function(u){ fn(u ? { email: u.email } : null); }); }); }
+  };
+}
+
+var store = CONFIG.firebase.apiKey ? FirebaseStore(CONFIG.firebase) : DemoStore();
+
+/* =========================================================
+   WEB: menú y copiar teléfono
+   ========================================================= */
+var tg = $('toggle'), menu = $('menu');
+tg.addEventListener('click', function(){ var a = menu.classList.toggle('abierto'); tg.setAttribute('aria-expanded', a); });
+menu.addEventListener('click', function(e){ if (e.target.tagName === 'A') { menu.classList.remove('abierto'); tg.setAttribute('aria-expanded', 'false'); } });
+var cp = $('copiar');
+cp.addEventListener('click', function(){
+  function ok(){ cp.textContent = 'Teléfono copiado'; setTimeout(function(){ cp.textContent = 'Copiar teléfono'; }, 2000); }
+  function seleccionar(){ var r = document.createRange(); r.selectNodeContents($('tel-txt')); var s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+  try { navigator.clipboard.writeText(CONFIG.telefono).then(ok, seleccionar); } catch(e) { seleccionar(); }
+});
+
+/* =========================================================
+   RESERVA ONLINE (5 pasos)
+   ========================================================= */
+var PASOS = ['Centro', 'Tratamiento', 'Día y hora', 'Tus datos'];
+var R = { paso: 1, centro: null, servicio: null, prof: 'any', /* siempre 'any': la clínica asigna la profesional */ fecha: null, hora: null, ocupados: [], peticion: 0 };
+if (store.modo === 'demo') $('demo-aviso').hidden = false;
+
+function irA(n, enfocar){
+  R.paso = n;
+  document.querySelectorAll('.paso-panel').forEach(function(p){ p.hidden = +p.getAttribute('data-paso') !== n; });
+  $('paso-nav').hidden = n === 1;
+  pintarProgreso();
+  if (n === 3) pintarDias();
+  if (n === 4) pintarResumen();
+  if (enfocar !== false) { var t = document.querySelector('.paso-panel[data-paso="' + n + '"] .paso-titulo'); if (t) t.focus({ preventScroll: true }); }
+}
+function pintarProgreso(){
+  var ol = $('progreso'); ol.innerHTML = '';
+  PASOS.forEach(function(nombre, i){
+    var n = i + 1, li = document.createElement('li');
+    li.className = n < R.paso ? 'hecho' : (n === R.paso ? 'actual' : '');
+    if (n === R.paso) li.setAttribute('aria-current', 'step');
+    if (n < R.paso) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = nombre;
+      b.setAttribute('aria-label', 'Volver al paso ' + n + ': ' + nombre);
+      b.addEventListener('click', function(){ irA(n); }); li.appendChild(b);
+    } else { var s = document.createElement('span'); s.textContent = nombre; li.appendChild(s); }
+    ol.appendChild(li);
+  });
+  var cuenta = document.createElement('li'); cuenta.className = 'cuenta'; cuenta.textContent = 'Paso ' + R.paso + ' de ' + PASOS.length; ol.appendChild(cuenta);
+}
+function opcion(titulo, sub, activo, onClick){
+  var b = document.createElement('button'); b.type = 'button'; b.className = 'opcion'; b.setAttribute('aria-pressed', activo ? 'true' : 'false');
+  b.innerHTML = '<strong>' + esc(titulo) + '</strong>' + (sub ? '<small>' + esc(sub) + '</small>' : '');
+  b.addEventListener('click', onClick); return b;
+}
+function pintarCentros(){
+  var c = $('op-centro'); c.innerHTML = '';
+  CONFIG.centros.forEach(function(ce){
+    c.appendChild(opcion(ce.nombre, ce.direccion, R.centro === ce.id, function(){ R.centro = ce.id; R.fecha = null; R.hora = null; pintarCentros(); irA(R.servicio ? 3 : 2); }));
+  });
+}
+function pintarServicios(){
+  var c = $('op-servicio'); c.innerHTML = '';
+  SERVICIOS.forEach(function(g){
+    var h = document.createElement('p'); h.className = 'grupo-etq'; h.textContent = g.grupo; c.appendChild(h);
+    var w = document.createElement('div'); w.className = 'opciones opciones-servicio';
+    g.items.forEach(function(it){
+      w.appendChild(opcion(it, 'Aprox. 60 min', R.servicio === it, function(){ R.servicio = it; pintarServicios(); irA(3); }));
+    });
+    c.appendChild(w);
+  });
+}
+function profsPosibles(fecha){
+  return CONFIG.profesionales.filter(function(p){ return (R.prof === 'any' || R.prof === p.id) && trabaja(p.id, R.centro, fecha); });
+}
+function diasDisponibles(){
+  var out = [], d = new Date(); d.setHours(0,0,0,0);
+  for (var i = 0; i < CONFIG.diasReservables; i++) {
+    var f = ymd(d);
+    if (abierto(f) && profsPosibles(f).length && CONFIG.horas.some(function(h){ return !enPasado(f, h); })) out.push(f);
+    d.setDate(d.getDate() + 1);
+  }
+  return out;
+}
+function pintarDias(){
+  var c = $('dias'); c.innerHTML = '';
+  var lista = diasDisponibles();
+  if (!lista.length) { $('estado-horas').textContent = 'No hay días disponibles con esta profesional en este centro.'; $('horas').innerHTML = ''; return; }
+  if (!R.fecha || lista.indexOf(R.fecha) < 0) R.fecha = lista[0];
+  lista.forEach(function(f){
+    var d = parseYmd(f), b = document.createElement('button');
+    b.type = 'button'; b.className = 'dia'; b.setAttribute('aria-pressed', f === R.fecha ? 'true' : 'false'); b.setAttribute('aria-label', fechaTxt(f));
+    b.innerHTML = '<small>' + DIAS_C[d.getDay()] + '</small><strong>' + d.getDate() + '</strong><small>' + MESES[d.getMonth()].slice(0,3) + '</small>';
+    b.addEventListener('click', function(){ R.fecha = f; R.hora = null; pintarDias(); });
+    c.appendChild(b);
+  });
+  cargarHoras();
+}
+function libresEn(hora){
+  return profsPosibles(R.fecha).filter(function(p){
+    return !R.ocupados.some(function(o){ return o.hora === hora && o.prof === p.id; });
+  });
+}
+function cargarHoras(){
+  var n = ++R.peticion, h = $('horas');
+  h.innerHTML = ''; h.setAttribute('aria-busy', 'true');
+  $('estado-horas').textContent = 'Buscando horas libres…';
+  store.ocupados(R.fecha).then(function(oc){
+    if (n !== R.peticion) return;
+    R.ocupados = oc; h.removeAttribute('aria-busy');
+    var hay = 0;
+    CONFIG.horas.forEach(function(hora){
+      var libre = !enPasado(R.fecha, hora) && libresEn(hora).length > 0;
+      if (libre) hay++;
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'hora'; b.textContent = hora;
+      b.disabled = !libre; b.setAttribute('aria-pressed', R.hora === hora ? 'true' : 'false');
+      if (!libre) b.setAttribute('aria-label', hora + ', no disponible');
+      b.addEventListener('click', function(){ R.hora = hora; irA(4); });
+      h.appendChild(b);
+    });
+    $('estado-horas').textContent = hay ? fechaTxt(R.fecha) + ' · ' + hay + (hay === 1 ? ' hora libre' : ' horas libres') : 'No quedan horas libres este día. Prueba con otro.';
+  }, function(){
+    if (n !== R.peticion) return;
+    h.removeAttribute('aria-busy');
+    $('estado-horas').textContent = 'No hemos podido cargar las horas. Revisa tu conexión y vuelve a elegir el día.';
+  });
+}
+function pintarResumen(){
+  $('resumen-cita').innerHTML =
+    '<dt>Centro</dt><dd>' + esc(centro(R.centro).nombre) + '</dd>' +
+    '<dt>Tratamiento</dt><dd>' + esc(R.servicio) + '</dd>' +
+    '<dt>Cuándo</dt><dd>' + esc(fechaTxt(R.fecha)) + ', ' + esc(R.hora) + '</dd>';
+}
+function errorCampo(id, msg){
+  var inp = $(id), e = $(id + '-error');
+  e.textContent = msg || ''; inp.setAttribute('aria-invalid', msg ? 'true' : 'false');
+}
+$('btn-atras').addEventListener('click', function(){ if (R.paso > 1) irA(R.paso - 1); });
+$('form-reserva').addEventListener('submit', function(ev){
+  ev.preventDefault();
+  var nombre = $('nombre').value.trim(), tel = $('telefono').value.trim(), notas = $('notas').value.trim();
+  var okN = nombre.length >= 2, okT = tel.replace(/\D/g, '').length >= 9;
+  errorCampo('nombre', okN ? '' : 'Escribe tu nombre para la cita.');
+  errorCampo('telefono', okT ? '' : 'Escribe un teléfono de 9 cifras para poder avisarte.');
+  $('aviso').textContent = '';
+  if (!okN) { $('nombre').focus(); return; }
+  if (!okT) { $('telefono').focus(); return; }
+  var btn = $('btn-confirmar'); btn.disabled = true; btn.textContent = 'Reservando…';
+  var candidatas = R.prof === 'any' ? libresEn(R.hora).map(function(p){ return p.id; }) : [R.prof];
+  // reparte las citas: primero la profesional con menos citas ese día
+  candidatas.sort(function(a, b){
+    function n(id){ return R.ocupados.filter(function(o){ return o.prof === id; }).length; }
+    return n(a) - n(b);
+  });
+  function intentar(i){
+    if (i >= candidatas.length) return Promise.reject(errOcupado());
+    return store.reservar({ centro: R.centro, fecha: R.fecha, hora: R.hora, prof: candidatas[i], servicio: R.servicio, nombre: nombre, telefono: tel, notas: notas, origen: 'web' })
+      .then(function(){ return candidatas[i]; }, function(e){ if (e && e.code === 'ocupado') return intentar(i + 1); throw e; });
+  }
+  intentar(0).then(function(pid){
+    $('c-nombre').textContent = nombre.split(' ')[0];
+    $('c-detalle').innerHTML =
+      '<dt>Centro</dt><dd>' + esc(centro(R.centro).nombre) + '</dd>' +
+      '<dt>Tratamiento</dt><dd>' + esc(R.servicio) + '</dd>' +
+      '<dt>Día</dt><dd>' + esc(fechaTxt(R.fecha)) + '</dd>' +
+      '<dt>Hora</dt><dd>' + esc(R.hora) + '</dd>';
+    document.querySelectorAll('.paso-panel').forEach(function(p){ p.hidden = true; });
+    $('progreso').hidden = true; $('paso-nav').hidden = true; $('confirmacion').hidden = false;
+    $('conf-titulo').focus({ preventScroll: true });
+  }, function(e){
+    if (e && e.code === 'ocupado') {
+      R.hora = null; irA(3, false);
+      $('estado-horas').textContent = 'Esa hora se acaba de reservar. Elige otra, por favor.';
+    } else {
+      $('aviso').textContent = 'No se ha podido guardar la cita. Revisa tu conexión e inténtalo de nuevo, o llámanos al ' + CONFIG.telefono + '.';
+    }
+  }).then(function(){ btn.disabled = false; btn.textContent = 'Confirmar cita'; });
+});
+$('otra').addEventListener('click', function(){
+  $('form-reserva').reset(); errorCampo('nombre', ''); errorCampo('telefono', '');
+  R.hora = null; $('confirmacion').hidden = true; $('progreso').hidden = false; irA(1);
+});
+document.querySelectorAll('[data-servicio]').forEach(function(a){
+  a.addEventListener('click', function(){ R.servicio = a.getAttribute('data-servicio'); pintarServicios(); irA(R.centro ? 3 : 1, false); });
+});
+pintarCentros(); pintarServicios(); irA(1, false);
+
+/* =========================================================
+   AGENDA PRIVADA (#agenda)
+   ========================================================= */
+var P = { centro: CONFIG.centros[0].id, fecha: null, datos: { ocupado: [], citas: {} }, quitar: null, usuario: null };
+(function(){ var d = new Date(); d.setHours(0,0,0,0); while (!abierto(ymd(d))) d.setDate(d.getDate() + 1); P.fecha = ymd(d); })();
+if (store.modo === 'demo') $('login-demo').hidden = false;
+
+function ruta(){
+  var ag = location.hash === '#agenda';
+  $('sitio').hidden = ag; $('panel').hidden = !ag;
+  if (ag) { window.scrollTo(0, 0); document.title = 'Agenda · Valênia Simões'; if (P.usuario) suscribir(); }
+  else { document.title = 'Valênia Simões'; if (P.quitar) { P.quitar(); P.quitar = null; } }
+}
+window.addEventListener('hashchange', ruta);
+store.alCambiarSesion(function(u){
+  P.usuario = u;
+  $('login').hidden = !!u; $('agenda-vista').hidden = !u; $('panel-usuario').hidden = !u;
+  $('usuario-email').textContent = u ? u.email : '';
+  if (u && location.hash === '#agenda') suscribir();
+  if (!u && P.quitar) { P.quitar(); P.quitar = null; }
+});
+$('form-login').addEventListener('submit', function(ev){
+  ev.preventDefault();
+  var em = $('login-email').value.trim(), pw = $('login-pass').value;
+  if (!em || !pw) { $('login-aviso').textContent = 'Escribe tu email y tu contraseña.'; return; }
+  $('login-aviso').textContent = '';
+  store.entrar(em, pw).catch(function(){ $('login-aviso').textContent = 'Email o contraseña incorrectos.'; });
+});
+$('btn-salir').addEventListener('click', function(){ store.salir(); });
+
+function suscribir(){
+  if (P.quitar) P.quitar();
+  pintarBarra();
+  P.quitar = store.suscribirDia(P.fecha, function(d){ P.datos = d; pintarRejilla(); });
+}
+function cambiarDia(delta){
+  var d = parseYmd(P.fecha);
+  do { d.setDate(d.getDate() + delta); } while (!abierto(ymd(d)));
+  P.fecha = ymd(d); suscribir();
+}
+$('dia-ant').addEventListener('click', function(){ cambiarDia(-1); });
+$('dia-sig').addEventListener('click', function(){ cambiarDia(1); });
+$('dia-hoy').addEventListener('click', function(){ var d = new Date(); d.setHours(0,0,0,0); P.fecha = ymd(d); if (!abierto(P.fecha)) { cambiarDia(1); return; } suscribir(); });
+$('fecha-input').addEventListener('change', function(){ if (this.value) { P.fecha = this.value; suscribir(); } });
+
+function pintarBarra(){
+  var seg = $('seg-centro'); seg.innerHTML = '';
+  CONFIG.centros.forEach(function(c){
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = c.nombre;
+    b.setAttribute('aria-pressed', P.centro === c.id ? 'true' : 'false');
+    b.addEventListener('click', function(){ P.centro = c.id; pintarBarra(); pintarRejilla(); });
+    seg.appendChild(b);
+  });
+  var t = fechaTxt(P.fecha); $('fecha-txt').textContent = t.charAt(0).toUpperCase() + t.slice(1);
+  $('fecha-input').value = P.fecha;
+}
+function mapaOcupado(){ var m = {}; P.datos.ocupado.forEach(function(o){ m[o.id] = o; }); return m; }
+function pintarRejilla(){
+  var m = mapaOcupado(), t = $('rejilla'), citas = 0, libres = 0;
+  var cols = profsDe(P.centro);
+  var html = '<thead><tr><th scope="col" class="col-hora">Hora</th>';
+  cols.forEach(function(p){
+    var aqui = trabaja(p.id, P.centro, P.fecha);
+    html += '<th scope="col"><span>' + esc(p.nombre) + '</span>' + (aqui ? '<button type="button" class="btn-dia" data-bloq-dia="' + p.id + '">Bloquear día</button>' : '') + '</th>';
+  });
+  html += '</tr></thead><tbody>';
+  CONFIG.horas.forEach(function(h){
+    html += '<tr><th scope="row" class="col-hora">' + h + '</th>';
+    cols.forEach(function(p){
+      var id = slotId(P.fecha, h, p.id), o = m[id], pasado = enPasado(P.fecha, h) ? ' pasado' : '';
+      if (o && o.centro !== P.centro) {
+        html += '<td class="celda otro' + pasado + '"><span>En ' + esc(centro(o.centro) ? centro(o.centro).nombre : 'otro centro') + '</span></td>';
+      } else if (!trabaja(p.id, P.centro, P.fecha)) {
+        html += '<td class="celda fuera"><span>No está en este centro</span></td>';
+      } else if (o && o.tipo === 'bloqueo') {
+        html += '<td class="celda bloq' + pasado + '"><button type="button" data-id="' + id + '">Bloqueado</button></td>';
+      } else if (o) {
+        citas++;
+        var c = P.datos.citas[id] || {};
+        html += '<td class="celda cita' + pasado + '"><button type="button" data-id="' + id + '"><strong>' + esc(c.nombre || 'Cita') + '</strong><small>' + esc(c.servicio || '') + '</small></button></td>';
+      } else {
+        if (!pasado) libres++;
+        html += '<td class="celda libre' + pasado + '"><button type="button" data-libre="' + id + '" data-hora="' + h + '" data-prof="' + p.id + '" aria-label="' + h + ', ' + esc(p.nombre) + ', libre">+</button></td>';
+      }
+    });
+    html += '</tr>';
+  });
+  t.innerHTML = html + '</tbody>';
+  $('agenda-resumen').textContent = centro(P.centro).nombre + ' · ' + citas + (citas === 1 ? ' cita' : ' citas') + ' · ' + libres + (libres === 1 ? ' hueco libre' : ' huecos libres');
+}
+$('rejilla').addEventListener('click', function(ev){
+  var b = ev.target.closest('button'); if (!b) return;
+  if (b.hasAttribute('data-bloq-dia')) return confirmarBloqueoDia(b.getAttribute('data-bloq-dia'));
+  if (b.hasAttribute('data-libre')) return modalLibre(b.getAttribute('data-hora'), b.getAttribute('data-prof'));
+  if (b.hasAttribute('data-id')) return modalOcupado(b.getAttribute('data-id'));
+});
+
+/* ---------- ventana (modal) ---------- */
+var ultimoFoco = null;
+function abrirModal(html){
+  ultimoFoco = document.activeElement;
+  $('modal-cuerpo').innerHTML = html; $('modal').hidden = false;
+  var f = $('modal-cuerpo').querySelector('input,select,button'); (f || $('modal-cerrar')).focus();
+}
+function cerrarModal(){ $('modal').hidden = true; $('modal-cuerpo').innerHTML = ''; if (ultimoFoco) ultimoFoco.focus(); }
+$('modal-cerrar').addEventListener('click', cerrarModal);
+$('modal').addEventListener('click', function(e){ if (e.target === this) cerrarModal(); });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !$('modal').hidden) cerrarModal(); });
+
+function cabModal(titulo, sub){ return '<p class="eyebrow">' + esc(sub) + '</p><h3 id="modal-titulo">' + esc(titulo) + '</h3>'; }
+function modalLibre(hora, pid){
+  var opts = ''; SERVICIOS.forEach(function(g){ opts += '<optgroup label="' + esc(g.grupo) + '">' + g.items.map(function(i){ return '<option>' + esc(i) + '</option>'; }).join('') + '</optgroup>'; });
+  opts += '<optgroup label="Por teléfono"><option>Manicura / pedicura</option><option>Micropigmentación</option></optgroup>';
+  abrirModal(cabModal(hora + ' · ' + prof(pid).nombre, centro(P.centro).nombre + ' · ' + fechaTxt(P.fecha)) +
+    '<form id="f-nueva" class="modal-form" novalidate>' +
+    '<p class="modal-sub">Apunta una cita pedida por teléfono o bloquea la hora.</p>' +
+    '<div class="campo"><label for="n-serv">Tratamiento</label><select id="n-serv">' + opts + '</select></div>' +
+    '<div class="campo"><label for="n-nombre">Nombre</label><input id="n-nombre" autocomplete="off"></div>' +
+    '<div class="campo"><label for="n-tel">Teléfono</label><input id="n-tel" type="tel" inputmode="tel" autocomplete="off"></div>' +
+    '<p class="aviso" id="n-aviso" role="alert"></p>' +
+    '<div class="modal-acciones"><button class="btn btn-lotus" type="submit">Guardar cita</button><button class="btn btn-linea" type="button" id="n-bloq">Bloquear hora</button></div></form>');
+  $('f-nueva').addEventListener('submit', function(e){
+    e.preventDefault();
+    var nombre = $('n-nombre').value.trim(); if (!nombre) { $('n-aviso').textContent = 'Escribe el nombre de la clienta.'; $('n-nombre').focus(); return; }
+    store.reservar({ centro: P.centro, fecha: P.fecha, hora: hora, prof: pid, servicio: $('n-serv').value, nombre: nombre, telefono: $('n-tel').value.trim(), notas: '', origen: 'clinica' })
+      .then(cerrarModal, function(){ $('n-aviso').textContent = 'Esa hora se acaba de ocupar. Cierra y elige otra.'; });
+  });
+  $('n-bloq').addEventListener('click', function(){
+    store.bloquear({ centro: P.centro, fecha: P.fecha, hora: hora, prof: pid }).then(cerrarModal, function(){ $('n-aviso').textContent = 'Esa hora ya está ocupada.'; });
+  });
+}
+function modalOcupado(id){
+  var o = mapaOcupado()[id]; if (!o) return;
+  var c = P.datos.citas[id], p = prof(o.prof);
+  if (o.tipo === 'bloqueo') {
+    abrirModal(cabModal('Hora bloqueada', o.hora + ' · ' + p.nombre + ' · ' + fechaTxt(o.fecha)) +
+      '<p class="modal-sub">Nadie puede reservar esta hora desde la web.</p><div class="modal-acciones"><button class="btn btn-lotus" type="button" id="m-lib">Desbloquear</button></div>');
+    $('m-lib').addEventListener('click', function(){ store.liberar(id).then(cerrarModal); });
+    return;
+  }
+  c = c || {};
+  abrirModal(cabModal(c.nombre || 'Cita', o.hora + ' · ' + p.nombre + ' · ' + centro(o.centro).nombre) +
+    '<dl class="modal-dl"><dt>Tratamiento</dt><dd>' + esc(c.servicio) + '</dd><dt>Teléfono</dt><dd>' + esc(c.telefono || '—') + '</dd>' +
+    (c.notas ? '<dt>Comentarios</dt><dd>' + esc(c.notas) + '</dd>' : '') +
+    '<dt>Reservada</dt><dd>' + (c.origen === 'clinica' ? 'Por la clínica' : 'Desde la web') + '</dd></dl>' +
+    '<div class="modal-acciones" id="m-acc"><button class="btn btn-linea" type="button" id="m-anular">Anular cita</button></div>');
+  $('m-anular').addEventListener('click', function(){
+    $('m-acc').innerHTML = '<p class="modal-sub" style="width:100%">¿Seguro? La hora volverá a quedar libre en la web.</p><button class="btn btn-lotus" type="button" id="m-si">Sí, anular</button><button class="btn btn-linea" type="button" id="m-no">No</button>';
+    $('m-si').focus();
+    $('m-si').addEventListener('click', function(){ store.liberar(id).then(cerrarModal); });
+    $('m-no').addEventListener('click', cerrarModal);
+  });
+}
+function confirmarBloqueoDia(pid){
+  var m = mapaOcupado(), libres = CONFIG.horas.filter(function(h){ return !m[slotId(P.fecha, h, pid)]; });
+  abrirModal(cabModal('Bloquear el día', prof(pid).nombre + ' · ' + fechaTxt(P.fecha)) +
+    '<p class="modal-sub">Se bloquearán las ' + libres.length + ' horas libres de este día (vacaciones, formación…). Las citas ya reservadas se mantienen.</p>' +
+    '<div class="modal-acciones"><button class="btn btn-lotus" type="button" id="bd-si">Bloquear ' + libres.length + ' horas</button><button class="btn btn-linea" type="button" id="bd-no">Cancelar</button></div>');
+  $('bd-no').addEventListener('click', cerrarModal);
+  $('bd-si').addEventListener('click', function(){
+    this.disabled = true;
+    Promise.all(libres.map(function(h){ return store.bloquear({ centro: P.centro, fecha: P.fecha, hora: h, prof: pid }).catch(function(){}); })).then(cerrarModal);
+  });
+}
+
+ruta();
+})();
+</script>
+
+</body>
+</html>
