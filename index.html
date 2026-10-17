@@ -329,7 +329,12 @@ input[aria-invalid="true"]{border-color:#B03A6F}
 .btn-desbloq{color:var(--texto-suave);display:block}
 .agenda-sub{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
 .agenda-botones{display:flex;flex-wrap:wrap;gap:8px}
-.modal.ancho{max-width:900px}
+.modal.ancho{max-width:920px}
+.rs-tabs{display:flex;flex-wrap:wrap;gap:6px;border-bottom:1px solid var(--linea);padding-bottom:12px}
+.rs-tab{font:inherit;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;border:1px solid var(--linea);background:var(--blanco);color:var(--texto-suave);border-radius:999px;padding:9px 14px;cursor:pointer;min-height:38px}
+.rs-tab[aria-selected="true"]{background:var(--lotus);border-color:var(--lotus);color:var(--blanco)}
+.rs-panel{display:flex;flex-direction:column;gap:12px}
+.rs-panel textarea{min-height:0}
 .estado-grid{display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start}
 .estado-ctrl{display:flex;flex-direction:column;gap:12px;min-width:0}
 .estado-prev canvas{display:block;width:100%;height:auto;border-radius:12px;box-shadow:0 18px 40px -24px rgba(51,48,51,.5)}
@@ -867,7 +872,7 @@ input[aria-invalid="true"]{border-color:#B03A6F}
         <button class="btn-texto" type="button" id="dia-hoy">Hoy</button>
       </div>
     </div>
-    <div class="agenda-sub"><p class="agenda-resumen" id="agenda-resumen" aria-live="polite"></p><span class="agenda-botones"><button class="btn btn-linea btn-nueva" type="button" id="btn-estado">Crear estado</button><button class="btn btn-lotus btn-nueva" type="button" id="btn-nueva">+ Cita a otra hora</button></span></div>
+    <div class="agenda-sub"><p class="agenda-resumen" id="agenda-resumen" aria-live="polite"></p><span class="agenda-botones"><button class="btn btn-linea btn-nueva" type="button" id="btn-estado">Redes sociales</button><button class="btn btn-lotus btn-nueva" type="button" id="btn-nueva">+ Cita a otra hora</button></span></div>
     <div class="leyenda"><span class="ley ley-cita">Cita</span><span class="ley ley-bloq">Bloqueado</span><span class="ley ley-solapa">Ocupado por otra cita</span><span class="ley ley-libre">Libre</span></div>
     <div class="rejilla-scroll"><table class="rejilla" id="rejilla"></table></div>
   </section>
@@ -1386,7 +1391,7 @@ function cambiarDia(delta){
   P.fecha = ymd(d); suscribir();
 }
 $('btn-nueva').addEventListener('click', function(){ modalLibre(null, null); });
-$('btn-estado').addEventListener('click', function(){ modalEstado(); });
+$('btn-estado').addEventListener('click', function(){ modalRedes(); });
 $('dia-ant').addEventListener('click', function(){ cambiarDia(-1); });
 $('dia-sig').addEventListener('click', function(){ cambiarDia(1); });
 $('dia-hoy').addEventListener('click', function(){ var d = new Date(); d.setHours(0,0,0,0); P.fecha = ymd(d); if (!abierto(P.fecha)) { cambiarDia(1); return; } suscribir(); });
@@ -1706,29 +1711,118 @@ function confirmarDesbloqueoDia(pid){
   });
 }
 
-/* ---------- Estado de WhatsApp con los huecos libres ---------- */
+/* ---------- Redes sociales: plantillas de imagen para estados e historias ---------- */
 var DIAS_LARGOS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+var RS_TRAT = [
+  { cat: 'Facial', img: 'img/radiofrecuencia.jpg', items: ['Limpieza facial profunda', 'Radiofrecuencia facial reafirmante'],
+    texto: 'Una piel limpia, luminosa y más firme. Limpieza profunda en varias fases y radiofrecuencia para estimular el colágeno.' },
+  { cat: 'Corporal', img: 'img/cavitacion.jpg', items: ['Criolipólisis reafirmante', 'Radiofrecuencia INDIBA', 'Electroestimulación', 'Presoterapia'],
+    texto: 'Tecnología para moldear la silueta sin cirugía: trabaja la grasa localizada, reafirma la piel y activa la circulación.' },
+  { cat: 'Masajes', img: 'img/drenaje.jpg', items: ['Drenaje linfático manual', 'Masaje modelador manual', 'Tratamiento anticelulítico'],
+    texto: 'Técnicas manuales para eliminar líquidos, moldear el contorno y liberar tensión. Piernas ligeras y una piel más lisa.' },
+  { cat: 'Manos y pies', img: 'img/unas.jpg', items: ['Manicura simple', 'Manicura semipermanente', 'Gel acrílico', 'Pedicura'],
+    texto: 'Manicura simple, semipermanente y gel acrílico, con un cuidado completo de uñas y cutículas. Pedicura con tratamiento de durezas.', tel: '+34 611 78 70 28' },
+  { cat: 'Mirada', img: 'img/cejas.jpg', items: ['Micropigmentación de cejas', 'Cejas 3D pelo a pelo'],
+    texto: 'Cejas definidas y naturales todos los días. Es un servicio que ofrecemos una vez al mes: plazas limitadas.', tel: '+34 638 17 70 78' }
+];
 function libresDia(oc, f, ce){
   return CONFIG.horas.filter(function(h){
     return !enPasado(f, h) && profsDe(ce).some(function(pp){ return trabaja(pp.id, ce, f) && !choca(oc, pp.id, h); });
   });
 }
-function modalEstado(){
+function catDe(item){ return RS_TRAT.filter(function(t){ return t.items.indexOf(item) >= 0; })[0] || RS_TRAT[0]; }
+var imgCache = {};
+function cargarImg(src, cb){
+  if (imgCache[src]) { if (imgCache[src].complete) cb(imgCache[src]); return; }
+  var im = new Image(); im.onload = function(){ cb(im); }; im.src = src; imgCache[src] = im;
+}
+
+function modalRedes(){
   var ce = P.centro, dias = [], d = new Date(); d.setHours(0,0,0,0);
   while (dias.length < 6) { var f = ymd(d); if (abierto(f)) dias.push(f); d.setDate(d.getDate() + 1); }
-  abrirModal(cabModal('Estado de WhatsApp', 'Huecos libres · ' + centro(ce).nombre) +
+  var RS = { tipo: 'huecos', foto: null };
+  var tabs = [['huecos', 'Huecos libres'], ['trat', 'Tratamiento'], ['precios', 'Precios'], ['pack', 'Packs']];
+  var optsTrat = RS_TRAT.map(function(t){ return '<optgroup label="' + esc(t.cat) + '">' + t.items.map(function(i){ return '<option>' + esc(i) + '</option>'; }).join('') + '</optgroup>'; }).join('');
+  var listaPrecios = function(cat){
+    return RS_TRAT.filter(function(t){ return cat === 'Todos' || t.cat === cat; })
+      .reduce(function(a, t){ return a.concat(t.items); }, []).map(function(i){ return i + ': '; }).join('\n');
+  };
+  abrirModal(cabModal('Redes sociales', 'Imágenes para estados e historias · ' + centro(ce).nombre) +
+    '<div class="rs-tabs" role="tablist">' + tabs.map(function(t, i){ return '<button type="button" role="tab" class="rs-tab" data-t="' + t[0] + '" aria-selected="' + (i === 0) + '">' + t[1] + '</button>'; }).join('') + '</div>' +
     '<div class="estado-grid"><div class="estado-ctrl">' +
-    '<p class="modal-sub">Marca los días que quieres publicar. Las horas libres se rellenan solas con la agenda; puedes borrar o añadir horas escribiéndolas.</p>' +
-    '<div class="campo"><label for="es-titulo">Título</label><input id="es-titulo" value="Huecos libres"></div>' +
-    '<div class="es-dias" id="es-dias">' + dias.map(function(f, i){
-      var dd = parseYmd(f);
-      return '<div class="es-dia"><label class="es-check"><input type="checkbox" data-f="' + f + '"' + (i < 3 ? ' checked' : '') + '><span>' + DIAS_LARGOS[dd.getDay()] + ' ' + dd.getDate() + '</span></label>' +
-        '<input class="es-horas" data-f="' + f + '" aria-label="Horas libres del ' + fechaTxt(f) + '" placeholder="Cargando…"></div>';
-    }).join('') + '</div>' +
+
+    // 1. Huecos libres
+    '<div class="rs-panel" data-t="huecos">' +
+      '<p class="modal-sub">Marca los días que quieres publicar. Las horas libres se rellenan solas con la agenda; puedes borrar o añadir horas escribiéndolas.</p>' +
+      '<div class="campo"><label for="es-titulo">Título</label><input id="es-titulo" value="Huecos libres"></div>' +
+      '<div class="es-dias" id="es-dias">' + dias.map(function(f, i){
+        var dd = parseYmd(f);
+        return '<div class="es-dia"><label class="es-check"><input type="checkbox" data-f="' + f + '"' + (i < 3 ? ' checked' : '') + '><span>' + DIAS_LARGOS[dd.getDay()] + ' ' + dd.getDate() + '</span></label>' +
+          '<input class="es-horas" data-f="' + f + '" aria-label="Horas libres del ' + fechaTxt(f) + '" placeholder="Cargando…"></div>';
+      }).join('') + '</div>' +
+    '</div>' +
+
+    // 2. Tratamiento
+    '<div class="rs-panel" data-t="trat" hidden>' +
+      '<p class="modal-sub">Elige el tratamiento. El texto y la foto se rellenan solos; puedes cambiarlos.</p>' +
+      '<div class="campo"><label for="rs-t-serv">Tratamiento</label><select id="rs-t-serv">' + optsTrat + '</select></div>' +
+      '<div class="campo"><label for="rs-t-titulo">Título</label><input id="rs-t-titulo"></div>' +
+      '<div class="campo"><label for="rs-t-texto">Texto</label><textarea id="rs-t-texto" rows="4"></textarea></div>' +
+      '<div class="campo"><label for="rs-t-foto">Foto (opcional: sube una tuya)</label><input id="rs-t-foto" type="file" accept="image/*"></div>' +
+    '</div>' +
+
+    // 3. Precios
+    '<div class="rs-panel" data-t="precios" hidden>' +
+      '<p class="modal-sub">Escribe el precio después de los dos puntos. Puedes borrar líneas o añadir otras.</p>' +
+      '<div class="dos"><div class="campo"><label for="rs-p-cat">Tratamientos</label><select id="rs-p-cat"><option>Todos</option>' + RS_TRAT.map(function(t){ return '<option>' + esc(t.cat) + '</option>'; }).join('') + '</select></div>' +
+      '<div class="campo"><label for="rs-p-titulo">Título</label><input id="rs-p-titulo" value="Nuestros precios"></div></div>' +
+      '<div class="campo"><label for="rs-p-lista">Lista de precios</label><textarea id="rs-p-lista" rows="9">' + esc(listaPrecios('Todos')) + '</textarea></div>' +
+    '</div>' +
+
+    // 4. Packs
+    '<div class="rs-panel" data-t="pack" hidden>' +
+      '<p class="modal-sub">Ejemplo de pack: cambia el nombre, lo que incluye, el precio y hasta cuándo es válido.</p>' +
+      '<div class="dos"><div class="campo"><label for="rs-k-etiqueta">Etiqueta</label><input id="rs-k-etiqueta" value="Pack"></div>' +
+      '<div class="campo"><label for="rs-k-titulo">Nombre del pack</label><input id="rs-k-titulo" value="Piernas ligeras"></div></div>' +
+      '<div class="campo"><label for="rs-k-lista">Qué incluye (una línea por cosa)</label><textarea id="rs-k-lista" rows="4">3 sesiones de presoterapia\n2 drenajes linfáticos manuales\nValoración personalizada</textarea></div>' +
+      '<div class="dos"><div class="campo"><label for="rs-k-precio">Precio</label><input id="rs-k-precio" placeholder="Ej.: 120 €"></div>' +
+      '<div class="campo"><label for="rs-k-antes">Precio antes (opcional)</label><input id="rs-k-antes" placeholder="Ej.: 150 €"></div></div>' +
+      '<div class="campo"><label for="rs-k-validez">Validez (opcional)</label><input id="rs-k-validez" value="Hasta el 30 de noviembre"></div>' +
+    '</div>' +
+
     '<p class="aviso" id="es-aviso" role="status"></p>' +
     '<div class="modal-acciones"><button class="btn btn-lotus" type="button" id="es-compartir">Compartir</button><button class="btn btn-linea" type="button" id="es-descargar">Descargar imagen</button></div>' +
-    '</div><div class="estado-prev"><canvas id="es-canvas" width="1080" height="1920" aria-label="Vista previa del estado"></canvas></div></div>');
+    '</div><div class="estado-prev"><canvas id="es-canvas" width="1080" height="1920" aria-label="Vista previa de la imagen"></canvas></div></div>');
   document.querySelector('#modal .modal').classList.add('ancho');
+
+  // pestañas
+  document.querySelectorAll('.rs-tab').forEach(function(b){
+    b.addEventListener('click', function(){
+      RS.tipo = b.getAttribute('data-t');
+      document.querySelectorAll('.rs-tab').forEach(function(x){ x.setAttribute('aria-selected', x === b ? 'true' : 'false'); });
+      document.querySelectorAll('.rs-panel').forEach(function(p){ p.hidden = p.getAttribute('data-t') !== RS.tipo; });
+      $('es-aviso').textContent = ''; dibujar();
+    });
+  });
+  // cualquier cambio redibuja
+  document.querySelectorAll('.estado-ctrl input, .estado-ctrl textarea, .estado-ctrl select').forEach(function(i){
+    if (i.type === 'file') return;
+    i.addEventListener('input', dibujar); i.addEventListener('change', dibujar);
+  });
+  // tratamiento: rellenar título, texto y foto
+  function rellenarTrat(){
+    var it = $('rs-t-serv').value, c = catDe(it);
+    $('rs-t-titulo').value = it; $('rs-t-texto').value = c.texto; RS.foto = null;
+    cargarImg(c.img, function(){ dibujar(); }); dibujar();
+  }
+  $('rs-t-serv').addEventListener('change', rellenarTrat); rellenarTrat();
+  $('rs-t-foto').addEventListener('change', function(){
+    var f = this.files && this.files[0]; if (!f) return;
+    var rd = new FileReader(); rd.onload = function(){ var im = new Image(); im.onload = function(){ RS.foto = im; dibujar(); }; im.src = rd.result; }; rd.readAsDataURL(f);
+  });
+  // precios: cambiar categoría rellena la lista
+  $('rs-p-cat').addEventListener('change', function(){ $('rs-p-lista').value = listaPrecios(this.value); dibujar(); });
+  // huecos: cargar de la agenda
   Promise.all(dias.map(function(f){ return store.ocupados(f).then(function(oc){ return [f, libresDia(oc, f, ce)]; }, function(){ return [f, null]; }); }))
     .then(function(res){
       res.forEach(function(x){
@@ -1738,12 +1832,11 @@ function modalEstado(){
       });
       dibujar();
     });
-  $('es-titulo').addEventListener('input', dibujar);
-  document.querySelectorAll('#es-dias input').forEach(function(i){ i.addEventListener('input', dibujar); i.addEventListener('change', dibujar); });
+
   $('es-descargar').addEventListener('click', function(){ hacerPng(function(file){ bajar(file); }); });
   $('es-compartir').addEventListener('click', function(){
     hacerPng(function(file){
-      if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file], title: 'Huecos libres' }).catch(function(){});
+      if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file], title: 'Valênia Simões' }).catch(function(){});
       else { bajar(file); $('es-aviso').textContent = 'Este dispositivo no permite compartir directamente: la imagen se ha descargado para que la subas al estado.'; }
     });
   });
@@ -1756,9 +1849,67 @@ function modalEstado(){
   }
   function hacerPng(cb){
     dibujar();
-    $('es-canvas').toBlob(function(b){ cb(new File([b], 'huecos-libres-' + ce + '.png', { type: 'image/png' })); }, 'image/png');
+    $('es-canvas').toBlob(function(b){ cb(new File([b], 'valenia-' + RS.tipo + '-' + ce + '.png', { type: 'image/png' })); }, 'image/png');
   }
-  function datos(){
+
+  /* --- dibujo --- */
+  var W = 1080, H = 1920;
+  function sp(ctx, v){ try { ctx.letterSpacing = v; } catch(e) {} }
+  function rrect(ctx, x, y, w, h, r2){ r2 = Math.min(r2, h / 2, w / 2); ctx.beginPath(); ctx.moveTo(x + r2, y); ctx.arcTo(x + w, y, x + w, y + h, r2); ctx.arcTo(x + w, y + h, x, y + h, r2); ctx.arcTo(x, y + h, x, y, r2); ctx.arcTo(x, y, x + w, y, r2); ctx.closePath(); }
+  function loto(ctx, cx, top, e){
+    var ps = [['M32 6c6 7 8 15 8 22s-3 12-8 16c-5-4-8-9-8-16s2-15 8-22z', 'rgba(229,106,174,.9)'],
+      ['M32 44c-7-2-14-7-17-15-2-5-2-10-1-14 7 2 13 7 16 13', '#F2A7CC'], ['M32 44c7-2 14-7 17-15 2-5 2-10 1-14-7 2-13 7-16 13', '#F2A7CC'],
+      ['M32 44c-9 1-18-2-24-8-3-3-5-7-6-10 7-1 15 1 21 6', '#F7C8DD'], ['M32 44c9 1 18-2 24-8 3-3 5-7 6-10-7-1-15 1-21 6', '#F7C8DD']];
+    ctx.save(); ctx.translate(cx - 32 * e, top); ctx.scale(e, e);
+    ps.forEach(function(x){ ctx.fillStyle = x[1]; ctx.fill(new Path2D(x[0])); }); ctx.restore();
+  }
+  function lineas(ctx, txt, ancho, max){
+    var out = [];
+    String(txt || '').split('\n').forEach(function(par){
+      var pal = par.split(/\s+/).filter(Boolean), l = '';
+      pal.forEach(function(w){ var t = l ? l + ' ' + w : w; if (ctx.measureText(t).width > ancho && l) { out.push(l); l = w; } else l = t; });
+      if (l) out.push(l);
+    });
+    if (max && out.length > max) { out = out.slice(0, max); out[max - 1] = out[max - 1].replace(/\s*\S*$/, '') + '…'; }
+    return out;
+  }
+  function base(ctx, eyebrow, compacto){
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#F2DDE5'; ctx.fillRect(0, 0, W, H);
+    rrect(ctx, 56, 56, W - 112, H - 112, 44); ctx.fillStyle = '#FAF7F4'; ctx.fill();
+    var e = compacto ? 1.6 : 2.3, y0 = compacto ? 105 : 130;
+    loto(ctx, W / 2, y0, e);
+    ctx.textAlign = 'center';
+    sp(ctx, '10px'); ctx.fillStyle = '#D9A6B5'; ctx.font = '400 ' + (compacto ? 42 : 50) + 'px "Cormorant Garamond", Georgia, serif';
+    ctx.fillText('VALÊNIA SIMÕES', W / 2, compacto ? 240 : 310);
+    sp(ctx, '6px'); ctx.fillStyle = '#6E6468'; ctx.font = '500 ' + (compacto ? 22 : 24) + 'px Manrope, Arial, sans-serif';
+    ctx.fillText(eyebrow.toUpperCase(), W / 2, compacto ? 284 : 362);
+    sp(ctx, '0px');
+    return compacto ? 310 : 410;
+  }
+  function pie(ctx, tel){
+    ctx.strokeStyle = '#E7DCDD'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(130, 1620); ctx.lineTo(950, 1620); ctx.stroke();
+    ctx.textAlign = 'center';
+    sp(ctx, '6px'); ctx.fillStyle = '#333033'; ctx.font = '600 28px Manrope, Arial, sans-serif';
+    ctx.fillText(tel ? 'PIDE TU CITA' : 'RESERVA ONLINE', W / 2, 1690); sp(ctx, '0px');
+    ctx.fillStyle = '#6E6468'; ctx.font = '400 30px Manrope, Arial, sans-serif';
+    ctx.fillText(tel ? 'Por teléfono o WhatsApp' : (location.host + location.pathname).replace(/\/$/, '').replace(/index\.html$/, ''), W / 2, 1742);
+    ctx.fillStyle = '#E56AAE'; ctx.font = 'italic 400 46px "Cormorant Garamond", Georgia, serif';
+    ctx.fillText((tel ? '' : 'o llámanos al ') + (tel || CONFIG.telefono).replace('+34 ', ''), W / 2, 1806);
+  }
+  function eyebrowCentro(){ return 'Clínica de estética · ' + centro(ce).nombre; }
+
+  function dibujar(){
+    var cv = $('es-canvas'); if (!cv) return;
+    var ctx = cv.getContext('2d');
+    if (RS.tipo === 'huecos') dibHuecos(ctx);
+    else if (RS.tipo === 'trat') dibTrat(ctx);
+    else if (RS.tipo === 'precios') dibPrecios(ctx);
+    else dibPack(ctx);
+  }
+
+  // 1. Huecos libres
+  function datosHuecos(){
     var out = [];
     document.querySelectorAll('#es-dias .es-dia').forEach(function(row){
       var cb = row.querySelector('input[type=checkbox]'); if (!cb.checked) return;
@@ -1767,31 +1918,21 @@ function modalEstado(){
     });
     return out;
   }
-  function pill(ctx, x, y, w, h){ var r2 = h / 2; ctx.beginPath(); ctx.moveTo(x + r2, y); ctx.arcTo(x + w, y, x + w, y + h, r2); ctx.arcTo(x + w, y + h, x, y + h, r2); ctx.arcTo(x, y + h, x, y, r2); ctx.arcTo(x, y, x + w, y, r2); ctx.closePath(); }
-  function rrect(ctx, x, y, w, h, r2){ ctx.beginPath(); ctx.moveTo(x + r2, y); ctx.arcTo(x + w, y, x + w, y + h, r2); ctx.arcTo(x + w, y + h, x, y + h, r2); ctx.arcTo(x, y + h, x, y, r2); ctx.arcTo(x, y, x + w, y, r2); ctx.closePath(); }
-  function loto(ctx, cx, top, esc2){
-    var ps = [['M32 6c6 7 8 15 8 22s-3 12-8 16c-5-4-8-9-8-16s2-15 8-22z', 'rgba(229,106,174,.9)'],
-      ['M32 44c-7-2-14-7-17-15-2-5-2-10-1-14 7 2 13 7 16 13', '#F2A7CC'], ['M32 44c7-2 14-7 17-15 2-5 2-10 1-14-7 2-13 7-16 13', '#F2A7CC'],
-      ['M32 44c-9 1-18-2-24-8-3-3-5-7-6-10 7-1 15 1 21 6', '#F7C8DD'], ['M32 44c9 1 18-2 24-8 3-3 5-7 6-10-7-1-15 1-21 6', '#F7C8DD']];
-    ctx.save(); ctx.translate(cx - 32 * esc2, top); ctx.scale(esc2, esc2);
-    ps.forEach(function(x){ ctx.fillStyle = x[1]; ctx.fill(new Path2D(x[0])); }); ctx.restore();
-  }
-  function maqueta(ctx, ds, k, pintar){
-    // devuelve la altura que ocupan los días con escala k
+  function maquetaHuecos(ctx, ds, k, top){
     var y = 0, x0 = 130, x1 = 950, chipH = 76 * k, gap = 16 * k;
     ds.forEach(function(dd){
       var fd = parseYmd(dd.f);
       ctx.font = '500 ' + Math.round(58 * k) + 'px "Cormorant Garamond", Georgia, serif';
-      if (pintar) { ctx.fillStyle = '#333033'; ctx.textAlign = 'left'; ctx.fillText(DIAS_LARGOS[fd.getDay()] + ' ' + fd.getDate() + ' de ' + MESES[fd.getMonth()], x0, pintar + y + 52 * k); }
+      if (top) { ctx.fillStyle = '#333033'; ctx.textAlign = 'left'; ctx.fillText(DIAS_LARGOS[fd.getDay()] + ' ' + fd.getDate() + ' de ' + MESES[fd.getMonth()], x0, top + y + 52 * k); }
       y += 76 * k;
       ctx.font = '600 ' + Math.round(38 * k) + 'px Manrope, Arial, sans-serif';
       var x = x0;
       dd.horas.forEach(function(h){
         var w = ctx.measureText(h).width + 56 * k;
         if (x + w > x1) { x = x0; y += chipH + gap; }
-        if (pintar) {
-          pill(ctx, x, pintar + y, w, chipH); ctx.fillStyle = '#E56AAE'; ctx.fill();
-          ctx.fillStyle = '#FFFFFF'; ctx.textAlign = 'center'; ctx.fillText(h, x + w / 2, pintar + y + chipH / 2 + 13 * k);
+        if (top) {
+          rrect(ctx, x, top + y, w, chipH, chipH / 2); ctx.fillStyle = '#E56AAE'; ctx.fill();
+          ctx.fillStyle = '#FFFFFF'; ctx.textAlign = 'center'; ctx.fillText(h, x + w / 2, top + y + chipH / 2 + 13 * k);
         }
         x += w + gap;
       });
@@ -1799,37 +1940,103 @@ function modalEstado(){
     });
     return y;
   }
-  function dibujar(){
-    var cv = $('es-canvas'); if (!cv) return;
-    var ctx = cv.getContext('2d'), W = 1080, H = 1920, ds = datos();
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = '#F2DDE5'; ctx.fillRect(0, 0, W, H);
-    rrect(ctx, 56, 56, W - 112, H - 112, 44); ctx.fillStyle = '#FAF7F4'; ctx.fill();
-    loto(ctx, W / 2, 130, 2.3);
-    ctx.textAlign = 'center';
-    try { ctx.letterSpacing = '10px'; } catch(e) {}
-    ctx.fillStyle = '#D9A6B5'; ctx.font = '400 50px "Cormorant Garamond", Georgia, serif'; ctx.fillText('VALÊNIA SIMÕES', W / 2, 310);
-    try { ctx.letterSpacing = '6px'; } catch(e) {}
-    ctx.fillStyle = '#6E6468'; ctx.font = '500 24px Manrope, Arial, sans-serif'; ctx.fillText(('Clínica de estética · ' + centro(ce).nombre).toUpperCase(), W / 2, 362);
-    try { ctx.letterSpacing = '0px'; } catch(e) {}
+  function dibHuecos(ctx){
+    base(ctx, eyebrowCentro());
     ctx.strokeStyle = '#D9A6B5'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(400, 410); ctx.lineTo(680, 410); ctx.stroke();
-    ctx.fillStyle = '#333033'; ctx.font = '300 120px "Cormorant Garamond", Georgia, serif'; ctx.fillText(($('es-titulo').value || 'Huecos libres').slice(0, 22), W / 2, 545);
+    ctx.textAlign = 'center'; ctx.fillStyle = '#333033'; ctx.font = '300 120px "Cormorant Garamond", Georgia, serif';
+    ctx.fillText(($('es-titulo').value || 'Huecos libres').slice(0, 22), W / 2, 545);
     ctx.fillStyle = '#6E6468'; ctx.font = 'italic 400 46px "Cormorant Garamond", Georgia, serif'; ctx.fillText('Reserva tu momento', W / 2, 612);
-    var top = 690, disponible = 1590 - top;
-    if (!ds.length) {
-      ctx.fillStyle = '#6E6468'; ctx.font = '400 36px Manrope, Arial, sans-serif'; ctx.fillText('Marca al menos un día con horas libres', W / 2, top + 200);
-    } else {
-      var k = 1, alto = maqueta(ctx, ds, 1, 0);
-      if (alto > disponible) k = Math.max(0.55, disponible / alto);
-      maqueta(ctx, ds, k, top);
+    var ds = datosHuecos(), top = 690, disp = 1590 - top;
+    if (!ds.length) { ctx.fillStyle = '#6E6468'; ctx.font = '400 36px Manrope, Arial, sans-serif'; ctx.fillText('Marca al menos un día con horas libres', W / 2, top + 200); }
+    else { var alto = maquetaHuecos(ctx, ds, 1, 0), k = alto > disp ? Math.max(0.55, disp / alto) : 1; maquetaHuecos(ctx, ds, k, top); }
+    pie(ctx);
+  }
+
+  // 2. Tratamiento destacado
+  function dibTrat(ctx){
+    var it = $('rs-t-serv').value, c = catDe(it);
+    base(ctx, eyebrowCentro(), true);
+    var im = RS.foto || (imgCache[c.img] && imgCache[c.img].complete ? imgCache[c.img] : null);
+    var fx = 116, fy = 340, fw = 848, fh = 640;
+    ctx.save(); rrect(ctx, fx, fy, fw, fh, 32); ctx.clip();
+    if (im) {
+      var r = Math.max(fw / im.width, fh / im.height), sw = fw / r, sh = fh / r;
+      ctx.drawImage(im, (im.width - sw) / 2, (im.height - sh) / 2, sw, sh, fx, fy, fw, fh);
+    } else { ctx.fillStyle = '#F2DDE5'; ctx.fillRect(fx, fy, fw, fh); }
+    ctx.restore();
+    var y = fy + fh + 90;
+    ctx.textAlign = 'left'; sp(ctx, '8px'); ctx.fillStyle = '#E56AAE'; ctx.font = '600 26px Manrope, Arial, sans-serif';
+    ctx.fillText(c.cat.toUpperCase(), 130, y); sp(ctx, '0px');
+    ctx.fillStyle = '#333033'; ctx.font = '300 88px "Cormorant Garamond", Georgia, serif';
+    lineas(ctx, $('rs-t-titulo').value, 820, 2).forEach(function(l){ y += 92; ctx.fillText(l, 130, y); });
+    y += 30;
+    ctx.fillStyle = '#6E6468'; ctx.font = '400 34px Manrope, Arial, sans-serif';
+    var max = Math.max(1, Math.floor((1580 - y) / 52));
+    lineas(ctx, $('rs-t-texto').value, 820, max).forEach(function(l){ y += 52; ctx.fillText(l, 130, y); });
+    pie(ctx, c.tel);
+  }
+
+  // 3. Precios
+  function dibPrecios(ctx){
+    var cat = $('rs-p-cat').value;
+    base(ctx, eyebrowCentro());
+    ctx.strokeStyle = '#D9A6B5'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(400, 410); ctx.lineTo(680, 410); ctx.stroke();
+    ctx.textAlign = 'center'; ctx.fillStyle = '#333033'; ctx.font = '300 110px "Cormorant Garamond", Georgia, serif';
+    ctx.fillText(($('rs-p-titulo').value || 'Nuestros precios').slice(0, 24), W / 2, 540);
+    ctx.fillStyle = '#6E6468'; ctx.font = 'italic 400 46px "Cormorant Garamond", Georgia, serif';
+    ctx.fillText(cat === 'Todos' ? 'Tarifas' : cat, W / 2, 605);
+    var filas = $('rs-p-lista').value.split('\n').map(function(l){ var i = l.lastIndexOf(':'); return i < 0 ? [l.trim(), ''] : [l.slice(0, i).trim(), l.slice(i + 1).trim()]; })
+      .filter(function(f){ return f[0]; });
+    var top = 680, disp = 1580 - top, lh = 96, k = Math.min(1, disp / Math.max(1, filas.length * lh));
+    k = Math.max(0.55, k);
+    filas.forEach(function(f, i){
+      var y = top + i * lh * k + 60 * k;
+      ctx.textAlign = 'right'; ctx.fillStyle = '#E56AAE'; ctx.font = '500 ' + Math.round(52 * k) + 'px "Cormorant Garamond", Georgia, serif';
+      var precio = f[1] || '—'; ctx.fillText(precio, 950, y); var pw = ctx.measureText(precio).width;
+      ctx.textAlign = 'left'; ctx.fillStyle = '#333033'; ctx.font = '500 ' + Math.round(36 * k) + 'px Manrope, Arial, sans-serif';
+      var nombre = f[0]; while (ctx.measureText(nombre).width > 820 - pw - 40 && nombre.length > 4) nombre = nombre.slice(0, -2);
+      if (nombre !== f[0]) nombre = nombre.replace(/\s*$/, '') + '…';
+      ctx.fillText(nombre, 130, y); var nw = ctx.measureText(nombre).width;
+      ctx.fillStyle = '#D9A6B5';
+      for (var x = 130 + nw + 16; x < 950 - pw - 16; x += 14) { ctx.beginPath(); ctx.arc(x, y - 8 * k, 2, 0, Math.PI * 2); ctx.fill(); }
+      if (i < filas.length - 1) { ctx.strokeStyle = '#E7DCDD'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(130, y + 34 * k); ctx.lineTo(950, y + 34 * k); ctx.stroke(); }
+    });
+    pie(ctx);
+  }
+
+  // 4. Packs
+  function dibPack(ctx){
+    base(ctx, eyebrowCentro());
+    var y = 470, et = ($('rs-k-etiqueta').value || '').trim();
+    if (et) {
+      ctx.font = '600 28px Manrope, Arial, sans-serif'; sp(ctx, '6px');
+      var tw = ctx.measureText(et.toUpperCase()).width + 70;
+      rrect(ctx, W / 2 - tw / 2, y - 48, tw, 68, 34); ctx.fillStyle = '#E56AAE'; ctx.fill();
+      ctx.fillStyle = '#FFFFFF'; ctx.textAlign = 'center'; ctx.fillText(et.toUpperCase(), W / 2 + 3, y - 4); sp(ctx, '0px');
+      y += 40;
     }
-    ctx.strokeStyle = '#E7DCDD'; ctx.beginPath(); ctx.moveTo(130, 1620); ctx.lineTo(950, 1620); ctx.stroke();
+    ctx.textAlign = 'center'; ctx.fillStyle = '#333033'; ctx.font = '300 112px "Cormorant Garamond", Georgia, serif';
+    lineas(ctx, $('rs-k-titulo').value || 'Pack', 840, 2).forEach(function(l){ y += 112; ctx.fillText(l, W / 2, y); });
+    y += 70;
+    var items = $('rs-k-lista').value.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+    ctx.textAlign = 'left'; ctx.font = '400 40px Manrope, Arial, sans-serif';
+    items.slice(0, 7).forEach(function(it){
+      var ls = lineas(ctx, it, 720, 2);
+      loto(ctx, 160, y - 6, 0.7);
+      ls.forEach(function(l, j){ ctx.fillStyle = '#333033'; ctx.fillText(l, 220, y + 36 + j * 54); });
+      y += 54 * ls.length + 34;
+    });
+    var precio = $('rs-k-precio').value.trim(), antes = $('rs-k-antes').value.trim(), val = $('rs-k-validez').value.trim();
+    var yp = Math.max(y + 60, 1240);
     ctx.textAlign = 'center';
-    try { ctx.letterSpacing = '6px'; } catch(e) {}
-    ctx.fillStyle = '#333033'; ctx.font = '600 28px Manrope, Arial, sans-serif'; ctx.fillText('RESERVA ONLINE', W / 2, 1690);
-    try { ctx.letterSpacing = '0px'; } catch(e) {}
-    ctx.fillStyle = '#6E6468'; ctx.font = '400 30px Manrope, Arial, sans-serif'; ctx.fillText((location.host + location.pathname).replace(/\/$/, '').replace(/index\.html$/, ''), W / 2, 1742);
-    ctx.fillStyle = '#E56AAE'; ctx.font = 'italic 400 46px "Cormorant Garamond", Georgia, serif'; ctx.fillText('o llámanos al ' + CONFIG.telefono.replace('+34 ', ''), W / 2, 1806);
+    if (antes) {
+      ctx.fillStyle = '#6E6468'; ctx.font = '400 44px Manrope, Arial, sans-serif'; ctx.fillText(antes, W / 2, yp);
+      var aw = ctx.measureText(antes).width; ctx.strokeStyle = '#6E6468'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(W / 2 - aw / 2 - 6, yp - 14); ctx.lineTo(W / 2 + aw / 2 + 6, yp - 14); ctx.stroke();
+      yp += 20;
+    }
+    if (precio) { ctx.fillStyle = '#E56AAE'; ctx.font = '400 150px "Cormorant Garamond", Georgia, serif'; ctx.fillText(precio, W / 2, yp + 130); yp += 150; }
+    if (val) { ctx.fillStyle = '#6E6468'; ctx.font = 'italic 400 44px "Cormorant Garamond", Georgia, serif'; ctx.fillText(val, W / 2, Math.min(yp + 80, 1580)); }
+    pie(ctx);
   }
 }
 
