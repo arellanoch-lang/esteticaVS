@@ -327,6 +327,11 @@ input[aria-invalid="true"]{border-color:#B03A6F}
 .celda.fuera span{background:none;font-style:italic}
 .celda.pasado{opacity:.55}
 .btn-desbloq{color:var(--texto-suave);display:block}
+.agenda-sub{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.btn-nueva{padding:10px 18px;font-size:.68rem}
+.celda.solapa button{background:#F6EEF1;color:var(--texto-suave);font-size:.72rem;border:1px dashed var(--rosa-empolvado);cursor:pointer}
+.ley-solapa::before{background:#F6EEF1;border:1px dashed var(--rosa-empolvado)}
+.modal .dos{grid-template-columns:1fr 1fr}
 @media (max-width:640px){
   .panel-cab-in{gap:12px}
   .panel-titulo{font-size:1.3rem;padding-left:12px}
@@ -849,8 +854,8 @@ input[aria-invalid="true"]{border-color:#B03A6F}
         <button class="btn-texto" type="button" id="dia-hoy">Hoy</button>
       </div>
     </div>
-    <p class="agenda-resumen" id="agenda-resumen" aria-live="polite"></p>
-    <div class="leyenda"><span class="ley ley-cita">Cita</span><span class="ley ley-bloq">Bloqueado</span><span class="ley ley-libre">Libre</span></div>
+    <div class="agenda-sub"><p class="agenda-resumen" id="agenda-resumen" aria-live="polite"></p><button class="btn btn-lotus btn-nueva" type="button" id="btn-nueva">+ Cita a otra hora</button></div>
+    <div class="leyenda"><span class="ley ley-cita">Cita</span><span class="ley ley-bloq">Bloqueado</span><span class="ley ley-solapa">Ocupado por otra cita</span><span class="ley ley-libre">Libre</span></div>
     <div class="rejilla-scroll"><table class="rejilla" id="rejilla"></table></div>
   </section>
 
@@ -892,8 +897,11 @@ var CONFIG = {
     { id: 'l2', centro: 'logrono', nombre: 'Profesional 2' },
     { id: 'l3', centro: 'logrono', nombre: 'Profesional 3' }
   ],
-  // Citas cada 45 minutos, de 9:00 a 18:45 (la última termina antes de las 20:00)
-  horas: ['09:00','09:45','10:30','11:15','12:00','12:45','13:30','14:15','15:00','15:45','16:30','17:15','18:00','18:45'],
+  // Horas que se ofrecen en la web: cada 60 minutos, de 9:00 a 19:00
+  horas: ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'],
+  duracion: 60,                   // minutos que ocupa cada cita o bloqueo
+  // En la agenda, la clínica puede apuntar citas a cualquier hora en tramos de 15 minutos
+  primeraHora: '09:00', ultimaHora: '19:00', tramo: 15,
   // Enlaces de Google para pedir reseña (Google Business → «Pedir reseñas»). Vacío = el mensaje pide la reseña sin enlace.
   resenas: { corella: '', logrono: '' },
   diasAbiertos: [1,2,3,4,5],      // lunes a viernes
@@ -926,6 +934,19 @@ function ymd(d){ return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(
 function parseYmd(s){ var p = s.split('-'); return new Date(+p[0], p[1]-1, +p[2]); }
 function fechaTxt(s){ var d = parseYmd(s); return DIAS_L[d.getDay()] + ' ' + d.getDate() + ' de ' + MESES[d.getMonth()]; }
 function slotId(fecha, hora, prof){ return fecha + '_' + hora + '_' + prof; }
+function mins(h){ var x = h.split(':'); return +x[0] * 60 + +x[1]; }
+function hhmm(m){ return pad(Math.floor(m / 60)) + ':' + pad(m % 60); }
+function solapa(a, b){ return Math.abs(mins(a) - mins(b)) < (CONFIG.duracion || 60); }
+// primera cita/bloqueo de esa profesional que se pisa con una cita a «hora»
+function choca(lista, pid, hora, excluirId){
+  for (var i = 0; i < lista.length; i++) { var o = lista[i]; if (o.prof === pid && o.id !== excluirId && solapa(o.hora, hora)) return o; }
+  return null;
+}
+function horasTramo(){
+  var out = [], m = mins(CONFIG.primeraHora), fin = mins(CONFIG.ultimaHora);
+  for (; m <= fin; m += CONFIG.tramo) out.push(hhmm(m));
+  return out;
+}
 function esc(t){ return String(t == null ? '' : t).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 function centro(id){ return CONFIG.centros.filter(function(c){ return c.id === id; })[0]; }
 function prof(id){ return CONFIG.profesionales.filter(function(p){ return p.id === id; })[0]; }
@@ -1197,7 +1218,7 @@ function pintarDias(){
 }
 function libresEn(hora){
   return profsPosibles(R.fecha).filter(function(p){
-    return !R.ocupados.some(function(o){ return o.hora === hora && o.prof === p.id; });
+    return !choca(R.ocupados, p.id, hora);
   });
 }
 function cargarHoras(){
@@ -1343,6 +1364,7 @@ function cambiarDia(delta){
   do { d.setDate(d.getDate() + delta); } while (!abierto(ymd(d)));
   P.fecha = ymd(d); suscribir();
 }
+$('btn-nueva').addEventListener('click', function(){ modalLibre(null, null); });
 $('dia-ant').addEventListener('click', function(){ cambiarDia(-1); });
 $('dia-sig').addEventListener('click', function(){ cambiarDia(1); });
 $('dia-hoy').addEventListener('click', function(){ var d = new Date(); d.setHours(0,0,0,0); P.fecha = ymd(d); if (!abierto(P.fecha)) { cambiarDia(1); return; } suscribir(); });
@@ -1373,7 +1395,7 @@ function pintarRejilla(){
   var html = '<thead><tr><th scope="col" class="col-hora">Hora</th>';
   cols.forEach(function(p){
     var aqui = trabaja(p.id, P.centro, P.fecha);
-    var nLib = CONFIG.horas.filter(function(h){ return !m[slotId(P.fecha, h, p.id)]; }).length;
+    var nLib = CONFIG.horas.filter(function(h){ return !choca(P.datos.ocupado, p.id, h); }).length;
     var nBloq = bloqueosDe(p.id).length;
     html += '<th scope="col"><span>' + esc(p.nombre) + '</span>' +
       (aqui && nLib ? '<button type="button" class="btn-dia" data-bloq-dia="' + p.id + '">Bloquear día</button>' : '') +
@@ -1395,6 +1417,9 @@ function pintarRejilla(){
         var c = P.datos.citas[id] || {};
         var env = c.mensajes || {}, nEnv = MENSAJES.filter(function(m){ return env[m.k]; }).length;
         html += '<td class="celda cita' + pasado + '"><button type="button" data-id="' + id + '"><strong>' + esc(c.nombre || 'Cita') + '</strong><small>' + esc(c.servicio || '') + '</small><span class="puntos" aria-label="' + nEnv + ' de 3 mensajes enviados">' + MENSAJES.map(function(m){ return '<i class="' + (env[m.k] ? 'si' : '') + '"></i>'; }).join('') + '</span></button></td>';
+      } else if (choca(P.datos.ocupado, p.id, h)) {
+        var ch = choca(P.datos.ocupado, p.id, h);
+        html += '<td class="celda solapa' + pasado + '"><button type="button" data-id="' + ch.id + '"><small>' + (ch.tipo === 'bloqueo' ? 'Bloqueo' : 'Cita') + ' a las ' + ch.hora + '</small></button></td>';
       } else {
         if (!pasado) libres++;
         html += '<td class="celda libre' + pasado + '"><button type="button" data-libre="' + id + '" data-hora="' + h + '" data-prof="' + p.id + '" aria-label="' + h + ', ' + esc(p.nombre) + ', libre">+</button></td>';
@@ -1429,22 +1454,47 @@ function cabModal(titulo, sub){ return '<p class="eyebrow">' + esc(sub) + '</p><
 function modalLibre(hora, pid){
   var opts = ''; SERVICIOS.forEach(function(g){ opts += '<optgroup label="' + esc(g.grupo) + '">' + g.items.map(function(i){ return '<option>' + esc(i) + '</option>'; }).join('') + '</optgroup>'; });
   opts += '<optgroup label="Por teléfono"><option>Manicura / pedicura</option><option>Micropigmentación</option></optgroup>';
-  abrirModal(cabModal(hora + ' · ' + prof(pid).nombre, centro(P.centro).nombre + ' · ' + fechaTxt(P.fecha)) +
+  var profs = profsDe(P.centro).filter(function(pp){ return trabaja(pp.id, P.centro, P.fecha); });
+  pid = pid || (profs[0] && profs[0].id);
+  hora = hora || CONFIG.horas[0];
+  abrirModal(cabModal('Nueva cita', centro(P.centro).nombre + ' · ' + fechaTxt(P.fecha)) +
     '<form id="f-nueva" class="modal-form" novalidate>' +
-    '<p class="modal-sub">Apunta una cita pedida por teléfono o bloquea la hora.</p>' +
+    '<p class="modal-sub">Apunta una cita pedida por teléfono o bloquea una hora. Cada cita ocupa ' + (CONFIG.duracion || 60) + ' minutos.</p>' +
+    '<div class="dos"><div class="campo"><label for="n-prof">Profesional</label><select id="n-prof">' + profs.map(function(pp){ return '<option value="' + pp.id + '"' + (pp.id === pid ? ' selected' : '') + '>' + esc(pp.nombre) + '</option>'; }).join('') + '</select></div>' +
+    '<div class="campo"><label for="n-hora">Hora</label><select id="n-hora"></select></div></div>' +
     '<div class="campo"><label for="n-serv">Tratamiento</label><select id="n-serv">' + opts + '</select></div>' +
     '<div class="campo"><label for="n-nombre">Nombre</label><input id="n-nombre" autocomplete="off"></div>' +
     '<div class="campo"><label for="n-tel">Teléfono</label><input id="n-tel" type="tel" inputmode="tel" autocomplete="off"></div>' +
     '<p class="aviso" id="n-aviso" role="alert"></p>' +
     '<div class="modal-acciones"><button class="btn btn-lotus" type="submit">Guardar cita</button><button class="btn btn-linea" type="button" id="n-bloq">Bloquear hora</button></div></form>');
+  function pintarHoras(){
+    var p2 = $('n-prof').value, sel = $('n-hora'), prev = sel.value || hora;
+    sel.innerHTML = horasTramo().map(function(h){
+      var c = choca(P.datos.ocupado, p2, h);
+      return '<option value="' + h + '"' + (c ? ' disabled' : '') + '>' + h + (c ? ' · ocupada' : '') + '</option>';
+    }).join('');
+    var ok = Array.prototype.filter.call(sel.options, function(op){ return !op.disabled; });
+    if (sel.querySelector('option[value="' + prev + '"]:not([disabled])')) sel.value = prev;
+    else if (ok.length) sel.value = ok[0].value;
+    $('n-aviso').textContent = ok.length ? '' : 'Esta profesional no tiene huecos libres este día.';
+  }
+  $('n-prof').addEventListener('change', pintarHoras); pintarHoras();
+  function datos(){
+    var h = $('n-hora').value, p2 = $('n-prof').value;
+    if (!h) { $('n-aviso').textContent = 'Elige una hora libre.'; return null; }
+    if (choca(P.datos.ocupado, p2, h)) { $('n-aviso').textContent = 'Esa hora se pisa con otra cita. Elige otra.'; return null; }
+    return { centro: P.centro, fecha: P.fecha, hora: h, prof: p2 };
+  }
   $('f-nueva').addEventListener('submit', function(e){
     e.preventDefault();
+    var d = datos(); if (!d) return;
     var nombre = $('n-nombre').value.trim(); if (!nombre) { $('n-aviso').textContent = 'Escribe el nombre de la clienta.'; $('n-nombre').focus(); return; }
-    store.reservar({ centro: P.centro, fecha: P.fecha, hora: hora, prof: pid, servicio: $('n-serv').value, nombre: nombre, telefono: $('n-tel').value.trim(), notas: '', origen: 'clinica' })
-      .then(cerrarModal, function(){ $('n-aviso').textContent = 'Esa hora se acaba de ocupar. Cierra y elige otra.'; });
+    store.reservar(Object.assign(d, { servicio: $('n-serv').value, nombre: nombre, telefono: $('n-tel').value.trim(), notas: '', origen: 'clinica' }))
+      .then(cerrarModal, function(){ $('n-aviso').textContent = 'Esa hora se acaba de ocupar. Elige otra.'; pintarHoras(); });
   });
   $('n-bloq').addEventListener('click', function(){
-    store.bloquear({ centro: P.centro, fecha: P.fecha, hora: hora, prof: pid }).then(cerrarModal, function(){ $('n-aviso').textContent = 'Esa hora ya está ocupada.'; });
+    var d = datos(); if (!d) return;
+    store.bloquear(d).then(cerrarModal, function(){ $('n-aviso').textContent = 'Esa hora ya está ocupada.'; pintarHoras(); });
   });
 }
 function modalOcupado(id){
@@ -1569,12 +1619,11 @@ function modalMover(id){
     if (!f || !abierto(f)) { sel.innerHTML = '<option value="">Ese día la clínica está cerrada</option>'; return; }
     store.ocupados(f).then(function(oc){
       if (n !== pet) return;
-      var ocup = {}; oc.forEach(function(x){ ocup[x.id] = true; });
       var opts = [];
-      CONFIG.horas.forEach(function(h){
+      horasTramo().forEach(function(h){
         if (enPasado(f, h)) return;
         profsDe(o.centro).forEach(function(pp){
-          if (!ocup[slotId(f, h, pp.id)]) opts.push({ v: h + '|' + pp.id, t: h + ' · ' + pp.nombre, misma: pp.id === o.prof });
+          if (!choca(oc, pp.id, h, id)) opts.push({ v: h + '|' + pp.id, t: h + ' · ' + pp.nombre, misma: pp.id === o.prof });
         });
       });
       if (!opts.length) { sel.innerHTML = '<option value="">No quedan huecos libres ese día</option>'; return; }
@@ -1607,7 +1656,7 @@ function modalMover(id){
   });
 }
 function confirmarBloqueoDia(pid){
-  var m = mapaOcupado(), libres = CONFIG.horas.filter(function(h){ return !m[slotId(P.fecha, h, pid)]; });
+  var libres = CONFIG.horas.filter(function(h){ return !choca(P.datos.ocupado, pid, h); });
   abrirModal(cabModal('Bloquear el día', prof(pid).nombre + ' · ' + fechaTxt(P.fecha)) +
     '<p class="modal-sub">Se bloquearán las ' + libres.length + ' horas libres de este día (vacaciones, formación…). Las citas ya reservadas se mantienen.</p>' +
     '<div class="modal-acciones"><button class="btn btn-lotus" type="button" id="bd-si">Bloquear ' + libres.length + ' horas</button><button class="btn btn-linea" type="button" id="bd-no">Cancelar</button></div>');
