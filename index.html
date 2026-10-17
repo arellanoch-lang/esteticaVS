@@ -5,11 +5,21 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Clínica de estética Valênia Simões en Corella y Logroño: tratamientos faciales, corporales, masajes, manicura y micropigmentación. Reserva tu cita online.">
 <title>Valênia Simões</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@300;400;500;600&display=swap">
 </head>
 <body style="margin:0">
 <style>
+/* Tipografías alojadas en la propia web (sin conexión a Google Fonts) */
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:300;font-display:swap;src:url(fonts/cormorant-garamond-latin-300-normal.woff2) format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:300;font-display:swap;src:url(fonts/cormorant-garamond-latin-300-italic.woff2) format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/cormorant-garamond-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:400;font-display:swap;src:url(fonts/cormorant-garamond-latin-400-italic.woff2) format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/cormorant-garamond-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:500;font-display:swap;src:url(fonts/cormorant-garamond-latin-500-italic.woff2) format('woff2')}
+@font-face{font-family:'Manrope';font-style:normal;font-weight:300;font-display:swap;src:url(fonts/manrope-latin-300-normal.woff2) format('woff2')}
+@font-face{font-family:'Manrope';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/manrope-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Manrope';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/manrope-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Manrope';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/manrope-latin-600-normal.woff2) format('woff2')}
+
 /* Layout: página editorial clara, secciones alternas marfil / rosa pálido, fotos con esquinas suaves, texto a la izquierda e imagen a la derecha como en el moodboard */
 :root{
   --marfil:#FAF7F4; --rosa-palido:#F2DDE5; --rosa-empolvado:#D9A6B5; --lotus:#E56AAE;
@@ -181,6 +191,32 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--lotus);b
 .banner-marca img{display:block;width:100%;border-radius:var(--radio);max-width:100%}
 @media (max-width:860px){.contacto-grid{grid-template-columns:1fr}}
 
+/* Formulario: privacidad */
+.campo-check{gap:4px}
+.campo > label.check-priv{display:flex;gap:10px;align-items:flex-start;font-size:.88rem;letter-spacing:0;text-transform:none;font-weight:400;color:var(--carbon);cursor:pointer}
+.check-priv input{width:20px;height:20px;margin:2px 0 0;padding:0;accent-color:var(--lotus);flex:none}
+.check-priv a,.info-rgpd a{color:var(--lotus)}
+.info-rgpd{font-size:.74rem;line-height:1.5;color:var(--texto-suave);background:var(--marfil);border-radius:10px;padding:10px 12px}
+.nota-tel-lista{display:flex;flex-direction:column;gap:2px;margin-top:6px!important;color:var(--carbon)}
+.pendiente{background:#FCE8EF;color:#B03A6F;border-radius:4px;padding:0 4px}
+.pie-links a{color:var(--texto-suave)}
+.pie-links a:hover{color:var(--lotus)}
+
+/* Textos legales */
+.legal-wrap{padding-block:32px 72px;max-width:820px}
+.legal-volver{margin-left:auto;text-decoration:none}
+.legal-nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+.legal-nav a{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;text-decoration:none;color:var(--texto-suave);border:1px solid var(--linea);border-radius:999px;padding:9px 16px;background:var(--blanco)}
+.legal-nav a[aria-current="page"]{background:var(--lotus);border-color:var(--lotus);color:var(--blanco)}
+.legal-doc h1{font-size:clamp(2.2rem,5vw,3rem);font-weight:300}
+.legal-fecha{font-size:.8rem;color:var(--texto-suave);margin:6px 0 24px!important}
+.legal-doc h2{font-family:var(--display);font-size:1.5rem;font-weight:500;margin:28px 0 8px}
+.legal-doc p,.legal-doc li{color:var(--texto-suave);font-size:.95rem;max-width:68ch}
+.legal-doc p + p{margin-top:10px}
+.legal-doc ul{padding-left:20px;margin:8px 0;display:flex;flex-direction:column;gap:6px}
+.legal-doc strong{color:var(--carbon);font-weight:600}
+.legal-doc a{color:var(--lotus)}
+
 footer{border-top:1px solid var(--linea);padding-block:28px;font-size:.8rem;color:var(--texto-suave)}
 footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
 
@@ -290,6 +326,34 @@ input[aria-invalid="true"]{border-color:#B03A6F}
 .celda.otro span,.celda.fuera span{display:flex;align-items:center;height:100%;min-height:50px;padding:6px 10px;border-radius:8px;background:#F1EEEC;color:var(--texto-suave);font-size:.76rem}
 .celda.fuera span{background:none;font-style:italic}
 .celda.pasado{opacity:.55}
+.btn-desbloq{color:var(--texto-suave);display:block}
+@media (max-width:640px){
+  .panel-cab-in{gap:12px}
+  .panel-titulo{font-size:1.3rem;padding-left:12px}
+  .panel-usuario span{display:none}
+  .agenda{padding-block:14px 40px;gap:10px}
+  .agenda-barra{gap:10px}
+  .segmentado{width:100%}
+  .segmentado button{flex:1;padding:10px 8px}
+  .fecha-nav{width:100%;justify-content:space-between;gap:4px}
+  .fecha-lbl{font-size:1.1rem;padding:0 2px;text-align:center;flex:1}
+  .btn-icono{width:40px;height:40px}
+  .leyenda{font-size:.7rem;gap:10px}
+  .rejilla-scroll{overflow-x:visible}
+  .rejilla{min-width:0;font-size:.7rem}
+  .rejilla thead th{padding:8px 4px;font-size:.68rem;line-height:1.25}
+  .rejilla .col-hora{width:40px;padding:8px 2px 8px 4px;font-size:.66rem}
+  .rejilla th,.rejilla td{padding:2px}
+  .btn-dia{font-size:.56rem;letter-spacing:.04em;padding:3px 0}
+  .celda{height:50px}
+  .celda button{min-height:44px;padding:4px 5px;border-radius:6px}
+  .celda.cita strong{font-size:.68rem}
+  .celda.cita small{font-size:.6rem}
+  .celda.libre button{font-size:1rem}
+  .celda.bloq button{font-size:.62rem}
+  .celda.otro span,.celda.fuera span{font-size:.6rem;padding:4px;min-height:44px}
+  .puntos i{width:5px;height:5px}
+}
 .modal-fondo{position:fixed;inset:0;background:rgba(51,48,51,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
 .modal{position:relative;background:var(--blanco);border-radius:var(--radio);padding:28px clamp(20px,4vw,32px);width:100%;max-width:440px;max-height:90vh;overflow:auto;display:flex;flex-direction:column;gap:12px}
 .modal h3{font-size:1.9rem}
@@ -429,8 +493,8 @@ input[aria-invalid="true"]{border-color:#B03A6F}
             <h3>Limpieza de cutis con aspirador y radiofrecuencia</h3>
             <p class="desc">Limpieza profunda en varias fases: desmaquillado, exfoliación, extracción con aspirador facial y un cierre con radiofrecuencia que calienta suavemente las capas profundas de la piel para estimular el colágeno. La piel queda limpia, luminosa y más firme.</p>
             <ul class="lista">
-              <li><span>Limpieza facial profunda</span><span>Aprox. 60 min</span></li>
-              <li><span>Radiofrecuencia facial reafirmante</span><span>Aprox. 60 min</span></li>
+              <li><span>Limpieza facial profunda</span><span>Entre 40 y 60 min</span></li>
+              <li><span>Radiofrecuencia facial reafirmante</span><span>Entre 40 y 60 min</span></li>
             </ul>
             <div class="importa"><strong>Por qué es importante</strong>Los poros obstruidos favorecen puntos negros e imperfecciones. Una limpieza profesional periódica mantiene la piel sana y retrasa la pérdida de firmeza.</div>
             <a class="btn btn-linea" href="#reservar" data-servicio="Limpieza facial profunda">Reservar este tratamiento</a>
@@ -444,10 +508,10 @@ input[aria-invalid="true"]{border-color:#B03A6F}
             <h3>Criolipólisis, radiofrecuencia INDIBA, electroestimulación y presoterapia</h3>
             <p class="desc">Tecnología para esculpir la silueta sin cirugía. La criolipólisis aplica frío controlado sobre la grasa localizada; la radiofrecuencia INDIBA calienta los tejidos en profundidad para reafirmar la piel y mejorar su textura; la electroestimulación tonifica el músculo y la presoterapia activa la circulación con presión secuencial.</p>
             <ul class="lista">
-              <li><span>Criolipólisis reafirmante</span><span>Aprox. 60 min</span></li>
-              <li><span>Radiofrecuencia INDIBA</span><span>Aprox. 60 min</span></li>
-              <li><span>Electroestimulación</span><span>Aprox. 60 min</span></li>
-              <li><span>Presoterapia</span><span>Aprox. 60 min</span></li>
+              <li><span>Criolipólisis reafirmante</span><span>Entre 40 y 60 min</span></li>
+              <li><span>Radiofrecuencia INDIBA</span><span>Entre 40 y 60 min</span></li>
+              <li><span>Electroestimulación</span><span>Entre 40 y 60 min</span></li>
+              <li><span>Presoterapia</span><span>Entre 40 y 60 min</span></li>
             </ul>
             <div class="importa"><strong>Por qué es importante</strong>La grasa localizada y la flacidez a veces no responden solo a la dieta y el ejercicio. Combinar estas técnicas con hábitos saludables ayuda a conseguir resultados visibles y duraderos.</div>
             <a class="btn btn-linea" href="#reservar" data-servicio="Radiofrecuencia INDIBA">Reservar este tratamiento</a>
@@ -461,9 +525,9 @@ input[aria-invalid="true"]{border-color:#B03A6F}
             <h3>Drenaje linfático, masaje modelador manual y anticelulítico</h3>
             <p class="desc">Técnicas manuales con ritmos y presiones distintas según el objetivo. El drenaje linfático, suave y rítmico, favorece la eliminación de líquidos. El masaje modelador, totalmente manual, trabaja el contorno con maniobras más intensas, y el anticelulítico actúa sobre la piel de naranja y mejora su textura.</p>
             <ul class="lista">
-              <li><span>Drenaje linfático manual</span><span>Aprox. 60 min</span></li>
-              <li><span>Masaje modelador manual</span><span>Aprox. 60 min</span></li>
-              <li><span>Tratamiento anticelulítico</span><span>Aprox. 60 min</span></li>
+              <li><span>Drenaje linfático manual</span><span>Entre 40 y 60 min</span></li>
+              <li><span>Masaje modelador manual</span><span>Entre 40 y 60 min</span></li>
+              <li><span>Tratamiento anticelulítico</span><span>Entre 40 y 60 min</span></li>
             </ul>
             <div class="importa"><strong>Por qué es importante</strong>Un sistema linfático activo reduce la hinchazón y la pesadez, y mejora el aspecto de la piel. Además, el masaje es una de las formas más eficaces de liberar tensión.</div>
             <a class="btn btn-linea" href="#reservar" data-servicio="Drenaje linfático manual">Reservar este tratamiento</a>
@@ -485,8 +549,8 @@ input[aria-invalid="true"]{border-color:#B03A6F}
             <div class="importa"><strong>Por qué es importante</strong>Unas uñas y cutículas bien cuidadas son más fuertes y evitan pequeñas lesiones e infecciones. Unos pies atendidos con regularidad previenen durezas y molestias al caminar.</div>
             <div class="cita-tel">
               <p><strong>Citas por teléfono</strong>Las citas de manicura y pedicura se dan por teléfono o WhatsApp.</p>
-              <p class="cita-tel-num">+34 638 17 70 78</p>
-              <div class="cita-tel-acciones"><a class="btn btn-lotus" href="tel:+34638177078">Llamar</a><a class="btn btn-linea" href="https://wa.me/34638177078" target="_blank" rel="noopener">WhatsApp</a></div>
+              <p class="cita-tel-num">+34 611 78 70 28</p>
+              <div class="cita-tel-acciones"><a class="btn btn-lotus" href="tel:+34611787028">Llamar</a><a class="btn btn-linea" href="https://wa.me/34611787028" target="_blank" rel="noopener">WhatsApp</a></div>
             </div>
           </div>
         </article>
@@ -548,10 +612,10 @@ input[aria-invalid="true"]{border-color:#B03A6F}
       <div class="reserva-caja">
         <aside class="reserva-info">
           <div class="paso"><b>1</b><p><strong>Centro y tratamiento</strong>Atendemos en Corella y en Logroño, con el mismo horario.</p></div>
-          <div class="paso"><b>2</b><p><strong>Día y hora</strong>Solo verás las horas libres. Cada sesión dura unos 60 minutos.</p></div>
+          <div class="paso"><b>2</b><p><strong>Día y hora</strong>Solo verás las horas libres. Cada sesión dura entre 40 y 60 minutos.</p></div>
           <div class="paso"><b>3</b><p><strong>Tus datos</strong>Al confirmar, la hora queda bloqueada a tu nombre.</p></div>
           <div class="nota-tel">
-            <p><strong>Manicura, pedicura y micropigmentación</strong>Estos servicios no se reservan online. Llámanos o escríbenos por WhatsApp al <span class="nowrap">+34 638 17 70 78</span>.</p>
+            <p><strong>Manicura, pedicura y micropigmentación</strong>Estos servicios no se reservan online. Llámanos o escríbenos por WhatsApp:</p><p class="nota-tel-lista"><span>Manicura y pedicura: <span class="nowrap">+34 611 78 70 28</span></span><span>Micropigmentación: <span class="nowrap">+34 638 17 70 78</span></span></p>
           </div>
         </aside>
 
@@ -590,7 +654,12 @@ input[aria-invalid="true"]{border-color:#B03A6F}
                 <div class="campo"><label for="nombre">Nombre y apellido</label><input id="nombre" autocomplete="name" required aria-describedby="nombre-error"><p class="error" id="nombre-error"></p></div>
                 <div class="campo"><label for="telefono">Teléfono</label><input id="telefono" type="tel" autocomplete="tel" inputmode="tel" required aria-describedby="telefono-error"><p class="error" id="telefono-error"></p></div>
               </div>
-              <div class="campo"><label for="notas">Comentarios (opcional)</label><textarea id="notas" placeholder="Cuéntanos si es tu primera visita o si tienes alguna preferencia"></textarea></div>
+              <div class="campo"><label for="notas">Comentarios (opcional)</label><textarea id="notas" placeholder="Por ejemplo, si es tu primera visita. No incluyas datos de salud."></textarea></div>
+              <div class="campo campo-check">
+                <label class="check-priv"><input type="checkbox" id="privacidad" aria-describedby="privacidad-error"><span>He leído y acepto la <a href="#privacidad" target="_blank">política de privacidad</a>.</span></label>
+                <p class="error" id="privacidad-error"></p>
+              </div>
+              <p class="info-rgpd"><strong>Responsable:</strong> <span data-legal-k="titular"></span>. <strong>Finalidad:</strong> gestionar tu cita y enviarte avisos sobre ella por WhatsApp. <strong>Derechos:</strong> acceso, rectificación, supresión y otros, como se explica en la <a href="#privacidad" target="_blank">política de privacidad</a>.</p>
               <p class="aviso" id="aviso" role="alert"></p>
               <button class="btn btn-lotus" type="submit" id="btn-confirmar">Confirmar cita</button>
             </form>
@@ -650,9 +719,97 @@ input[aria-invalid="true"]{border-color:#B03A6F}
 <footer>
   <div class="wrap">
     <span>© 2026 Valênia Simões · Clínica de estética</span>
-    <span>Aviso legal · Política de privacidad · <a href="#agenda" class="acceso">Acceso clínica</a></span>
+    <span class="pie-links"><a href="#aviso-legal">Aviso legal</a> · <a href="#privacidad">Privacidad</a> · <a href="#cookies">Cookies</a> · <a href="#agenda" class="acceso">Acceso clínica</a></span>
   </div>
 </footer>
+</div>
+
+<!-- ============ TEXTOS LEGALES ============ -->
+<div id="legal" hidden>
+  <header class="panel-cab">
+    <div class="wrap panel-cab-in">
+      <a class="logo" href="#inicio" aria-label="Volver a la web">
+        <span class="logo-txt">Valênia<br>Simões</span>
+        <svg aria-hidden="true" viewBox="0 0 64 48"><use href="#loto"/></svg>
+      </a>
+      <a class="btn-texto legal-volver" href="#inicio">← Volver a la web</a>
+    </div>
+  </header>
+  <div class="wrap legal-wrap">
+    <nav class="legal-nav" aria-label="Textos legales">
+      <a href="#aviso-legal">Aviso legal</a><a href="#privacidad">Política de privacidad</a><a href="#cookies">Política de cookies</a>
+    </nav>
+
+    <article class="legal-doc" data-legal="aviso-legal">
+      <h1>Aviso legal</h1>
+      <p class="legal-fecha">Última actualización: octubre de 2026</p>
+      <h2>1. Datos identificativos</h2>
+      <p>En cumplimiento del artículo 10 de la Ley 34/2002, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE), se informa de los datos del titular de este sitio web:</p>
+      <ul>
+        <li><strong>Titular:</strong> <span data-legal-k="titular"></span></li>
+        <li><strong>NIF:</strong> <span data-legal-k="nif"></span></li>
+        <li><strong>Domicilio:</strong> <span data-legal-k="domicilio"></span></li>
+        <li><strong>Centros:</strong> Calle María Teresa Sáenz de Heredia, 39, 31591 Corella (Navarra) · Calle Vara de Rey, 48, Logroño (La Rioja)</li>
+        <li><strong>Teléfono:</strong> <span data-legal-k="telefono"></span></li>
+        <li><strong>Email:</strong> <span data-legal-k="email"></span></li>
+      </ul>
+      <h2>2. Objeto</h2>
+      <p>Este sitio web informa sobre los servicios de la clínica de estética y permite a las personas usuarias reservar cita online para determinados tratamientos.</p>
+      <h2>3. Condiciones de uso</h2>
+      <p>El acceso a la web es gratuito. Quien la utiliza se compromete a hacer un uso adecuado de sus contenidos y a facilitar datos veraces al reservar una cita. La clínica puede anular las reservas que contengan datos falsos o que se hayan hecho de forma abusiva.</p>
+      <h2>4. Reservas</h2>
+      <p>La reserva online bloquea la hora elegida en la agenda de la clínica. La duración de cada sesión es orientativa (entre 40 y 60 minutos). Si no puedes acudir, te rogamos que avises con antelación por teléfono o WhatsApp para liberar la hora. La información de esta web no sustituye la valoración profesional que se realiza en cabina antes de cada tratamiento.</p>
+      <h2>5. Propiedad intelectual</h2>
+      <p>Los textos, el diseño, el logotipo y las imágenes de esta web pertenecen a su titular o se usan con licencia. No está permitida su reproducción o distribución sin autorización.</p>
+      <h2>6. Responsabilidad</h2>
+      <p>La clínica trabaja para que la información de la web sea correcta y esté actualizada, pero no se hace responsable de interrupciones del servicio por causas técnicas ajenas ni del contenido de los sitios externos enlazados (por ejemplo, Google Maps, Instagram o WhatsApp).</p>
+      <h2>7. Legislación aplicable</h2>
+      <p>Este aviso legal se rige por la legislación española. Para cualquier controversia, las partes se someten a los juzgados y tribunales que correspondan según la normativa aplicable, incluida la de protección de las personas consumidoras.</p>
+    </article>
+
+    <article class="legal-doc" data-legal="privacidad">
+      <h1>Política de privacidad</h1>
+      <p class="legal-fecha">Última actualización: octubre de 2026</p>
+      <p>Esta política explica cómo se tratan los datos personales que facilitas al reservar una cita, de acuerdo con el Reglamento (UE) 2016/679 (RGPD) y la Ley Orgánica 3/2018 de Protección de Datos Personales y garantía de los derechos digitales (LOPDGDD).</p>
+      <h2>1. Responsable del tratamiento</h2>
+      <ul>
+        <li><strong>Responsable:</strong> <span data-legal-k="titular"></span> · NIF <span data-legal-k="nif"></span></li>
+        <li><strong>Domicilio:</strong> <span data-legal-k="domicilio"></span></li>
+        <li><strong>Contacto:</strong> <span data-legal-k="email"></span> · <span data-legal-k="telefono"></span></li>
+      </ul>
+      <h2>2. Qué datos tratamos</h2>
+      <p>Al reservar una cita: nombre, teléfono, centro, tratamiento, día y hora, y los comentarios que quieras añadir. Por la web no pedimos datos de salud; si hay algo que debamos saber antes del tratamiento, lo hablaremos en cabina.</p>
+      <h2>3. Para qué los usamos y con qué base legal</h2>
+      <ul>
+        <li><strong>Gestionar tu cita</strong> (reservarla, cambiarla o anularla) y enviarte por WhatsApp la confirmación y el recordatorio. Base legal: la aplicación de medidas precontractuales y la prestación del servicio que solicitas (art. 6.1.b RGPD).</li>
+        <li><strong>Enviarte un mensaje de agradecimiento</strong> después de la cita con el enlace para reservar de nuevo y la invitación a dejar una reseña. Base legal: interés legítimo de la clínica en mantener la relación con sus clientas (art. 6.1.f RGPD). Puedes pedir en cualquier momento que no te lo enviemos.</li>
+      </ul>
+      <p>No usamos tus datos para elaborar perfiles ni para tomar decisiones automatizadas.</p>
+      <h2>4. Cuánto tiempo los guardamos</h2>
+      <p>Mientras sean necesarios para gestionar tus citas y la relación con la clínica. Después se conservarán bloqueados solo durante los plazos que exija la ley, y finalmente se suprimirán. Puedes pedir que borremos tus datos en cualquier momento.</p>
+      <h2>5. A quién se comunican</h2>
+      <p>No cedemos tus datos a terceros, salvo obligación legal. Para que la web funcione contamos con estos proveedores, que actúan como encargados del tratamiento:</p>
+      <ul>
+        <li><strong>Google (Firebase):</strong> base de datos donde se guardan las citas.</li>
+        <li><strong>GitHub:</strong> alojamiento de la web.</li>
+        <li><strong>WhatsApp (Meta):</strong> cuando te enviamos mensajes sobre tu cita.</li>
+      </ul>
+      <p>Algunos de estos proveedores pueden tratar datos fuera del Espacio Económico Europeo. En ese caso, las transferencias se amparan en el Marco de Privacidad de Datos UE-EE. UU. o en cláusulas contractuales tipo aprobadas por la Comisión Europea.</p>
+      <h2>6. Tus derechos</h2>
+      <p>Puedes ejercer tus derechos de acceso, rectificación, supresión, oposición, limitación del tratamiento y portabilidad escribiendo a <span data-legal-k="email"></span> o en cualquiera de nuestros centros, indicando qué derecho quieres ejercer. Si consideras que no hemos atendido bien tu solicitud, puedes reclamar ante la Agencia Española de Protección de Datos (<a href="https://www.aepd.es" target="_blank" rel="noopener">www.aepd.es</a>).</p>
+      <h2>7. Seguridad</h2>
+      <p>Aplicamos medidas técnicas y organizativas para proteger tus datos: la agenda solo es accesible para la clínica con usuario y contraseña, y desde la web nadie puede ver los datos de otras clientas.</p>
+    </article>
+
+    <article class="legal-doc" data-legal="cookies">
+      <h1>Política de cookies</h1>
+      <p class="legal-fecha">Última actualización: octubre de 2026</p>
+      <p>Esta web <strong>no utiliza cookies de análisis, de publicidad ni de seguimiento</strong>, por lo que no necesita pedirte consentimiento para instalarlas.</p>
+      <p>Solo se usa el almacenamiento técnico imprescindible para que funcionen la reserva online y el acceso privado de la clínica a su agenda (por ejemplo, para mantener abierta la sesión de la clínica). Este almacenamiento está exceptuado del deber de consentimiento según el artículo 22.2 de la LSSI-CE.</p>
+      <p>Las tipografías de la web se sirven desde el propio sitio, sin conexión a servicios de terceros.</p>
+      <p>Si en el futuro se incorporan herramientas de análisis o publicidad, se actualizará esta política y se pedirá tu consentimiento antes de usarlas.</p>
+    </article>
+  </div>
 </div>
 
 <!-- ============ AGENDA PRIVADA DE LA CLÍNICA ============ -->
@@ -714,6 +871,14 @@ input[aria-invalid="true"]{border-color:#B03A6F}
    ========================================================= */
 var CONFIG = {
   telefono: '+34 638 17 70 78',
+  // Datos del titular para el aviso legal y la política de privacidad (obligatorios por ley)
+  legal: {
+    titular: 'Valênia Simões',          // nombre completo de la titular o razón social
+    nif: '',                            // NIF / CIF
+    domicilio: 'Calle María Teresa Sáenz de Heredia, 39, 31591 Corella (Navarra)',
+    email: '',                          // email para ejercer derechos de protección de datos
+    telefono: '+34 638 17 70 78'
+  },
   centros: [
     { id: 'corella', nombre: 'Corella', direccion: 'C/ María Teresa Sáenz de Heredia, 39' },
     { id: 'logrono', nombre: 'Logroño', direccion: 'Calle Vara de Rey, 48' }
@@ -727,7 +892,8 @@ var CONFIG = {
     { id: 'l2', centro: 'logrono', nombre: 'Profesional 2' },
     { id: 'l3', centro: 'logrono', nombre: 'Profesional 3' }
   ],
-  horas: ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'],
+  // Citas cada 45 minutos, de 9:00 a 18:45 (la última termina antes de las 20:00)
+  horas: ['09:00','09:45','10:30','11:15','12:00','12:45','13:30','14:15','15:00','15:45','16:30','17:15','18:00','18:45'],
   // Enlaces de Google para pedir reseña (Google Business → «Pedir reseñas»). Vacío = el mensaje pide la reseña sin enlace.
   resenas: { corella: '', logrono: '' },
   diasAbiertos: [1,2,3,4,5],      // lunes a viernes
@@ -892,7 +1058,7 @@ function FirebaseStore(cfg){
         var id = slotId(c.fecha, c.hora, c.prof);
         return ocupar(x, id,
           { centro: c.centro, fecha: c.fecha, hora: c.hora, prof: c.prof, tipo: 'cita' },
-          { centro: c.centro, fecha: c.fecha, hora: c.hora, prof: c.prof, servicio: c.servicio, nombre: c.nombre, telefono: c.telefono, notas: c.notas || '', origen: c.origen, creada: firebase.firestore.FieldValue.serverTimestamp() });
+          { centro: c.centro, fecha: c.fecha, hora: c.hora, prof: c.prof, servicio: c.servicio, nombre: c.nombre, telefono: c.telefono, notas: c.notas || '', origen: c.origen, privacidad: !!c.privacidad, creada: firebase.firestore.FieldValue.serverTimestamp() });
       });
     },
     bloquear: function(o){
@@ -998,7 +1164,7 @@ function pintarServicios(){
     var h = document.createElement('p'); h.className = 'grupo-etq'; h.textContent = g.grupo; c.appendChild(h);
     var w = document.createElement('div'); w.className = 'opciones opciones-servicio';
     g.items.forEach(function(it){
-      w.appendChild(opcion(it, 'Aprox. 60 min', R.servicio === it, function(){ R.servicio = it; pintarServicios(); irA(3); }));
+      w.appendChild(opcion(it, 'Entre 40 y 60 min', R.servicio === it, function(){ R.servicio = it; pintarServicios(); irA(3); }));
     });
     c.appendChild(w);
   });
@@ -1076,8 +1242,12 @@ $('form-reserva').addEventListener('submit', function(ev){
   errorCampo('nombre', okN ? '' : 'Escribe tu nombre para la cita.');
   errorCampo('telefono', okT ? '' : 'Escribe un teléfono de 9 cifras para poder avisarte.');
   $('aviso').textContent = '';
+  var okP = $('privacidad').checked;
+  $('privacidad-error').textContent = okP ? '' : 'Para reservar tienes que aceptar la política de privacidad.';
+  $('privacidad').setAttribute('aria-invalid', okP ? 'false' : 'true');
   if (!okN) { $('nombre').focus(); return; }
   if (!okT) { $('telefono').focus(); return; }
+  if (!okP) { $('privacidad').focus(); return; }
   var btn = $('btn-confirmar'); btn.disabled = true; btn.textContent = 'Reservando…';
   var candidatas = R.prof === 'any' ? libresEn(R.hora).map(function(p){ return p.id; }) : [R.prof];
   // reparte las citas: primero la profesional con menos citas ese día
@@ -1087,7 +1257,7 @@ $('form-reserva').addEventListener('submit', function(ev){
   });
   function intentar(i){
     if (i >= candidatas.length) return Promise.reject(errOcupado());
-    return store.reservar({ centro: R.centro, fecha: R.fecha, hora: R.hora, prof: candidatas[i], servicio: R.servicio, nombre: nombre, telefono: tel, notas: notas, origen: 'web' })
+    return store.reservar({ centro: R.centro, fecha: R.fecha, hora: R.hora, prof: candidatas[i], servicio: R.servicio, nombre: nombre, telefono: tel, notas: notas, origen: 'web', privacidad: true })
       .then(function(){ return candidatas[i]; }, function(e){ if (e && e.code === 'ocupado') return intentar(i + 1); throw e; });
   }
   intentar(0).then(function(pid){
@@ -1125,9 +1295,24 @@ var P = { centro: CONFIG.centros[0].id, fecha: null, datos: { ocupado: [], citas
 (function(){ var d = new Date(); d.setHours(0,0,0,0); while (!abierto(ymd(d))) d.setDate(d.getDate() + 1); P.fecha = ymd(d); })();
 if (store.modo === 'demo') $('login-demo').hidden = false;
 
+var LEGALES = ['aviso-legal', 'privacidad', 'cookies'];
+function rellenarLegal(){
+  document.querySelectorAll('[data-legal-k]').forEach(function(el){
+    var v = (CONFIG.legal || {})[el.getAttribute('data-legal-k')];
+    el.textContent = v || '[pendiente]';
+    el.classList.toggle('pendiente', !v);
+  });
+}
+rellenarLegal();
 function ruta(){
-  var ag = location.hash === '#agenda';
-  $('sitio').hidden = ag; $('panel').hidden = !ag;
+  var h = location.hash.slice(1), ag = h === 'agenda', lg = LEGALES.indexOf(h) >= 0;
+  $('sitio').hidden = ag || lg; $('panel').hidden = !ag; $('legal').hidden = !lg;
+  if (lg) {
+    document.querySelectorAll('.legal-doc').forEach(function(d){ d.hidden = d.getAttribute('data-legal') !== h; });
+    document.querySelectorAll('.legal-nav a').forEach(function(a){ a.setAttribute('aria-current', a.getAttribute('href') === '#' + h ? 'page' : 'false'); });
+    window.scrollTo(0, 0); document.title = $('legal').querySelector('.legal-doc:not([hidden]) h1').textContent + ' · Valênia Simões';
+    return;
+  }
   if (ag) { window.scrollTo(0, 0); document.title = 'Agenda · Valênia Simões'; if (P.usuario) suscribir(); }
   else { document.title = 'Valênia Simões'; if (P.quitar) { P.quitar(); P.quitar = null; } }
 }
@@ -1175,16 +1360,27 @@ function pintarBarra(){
   $('fecha-input').value = P.fecha;
 }
 function mapaOcupado(){ var m = {}; P.datos.ocupado.forEach(function(o){ m[o.id] = o; }); return m; }
+function horasDelDia(){
+  // horas de la agenda + horas de citas antiguas que no encajan en la cuadrícula actual
+  var hs = CONFIG.horas.slice();
+  P.datos.ocupado.forEach(function(o){ if (o.centro === P.centro && hs.indexOf(o.hora) < 0) hs.push(o.hora); });
+  return hs.sort();
+}
+function bloqueosDe(pid){ return P.datos.ocupado.filter(function(o){ return o.prof === pid && o.tipo === 'bloqueo' && o.fecha === P.fecha; }); }
 function pintarRejilla(){
   var m = mapaOcupado(), t = $('rejilla'), citas = 0, libres = 0;
   var cols = profsDe(P.centro);
   var html = '<thead><tr><th scope="col" class="col-hora">Hora</th>';
   cols.forEach(function(p){
     var aqui = trabaja(p.id, P.centro, P.fecha);
-    html += '<th scope="col"><span>' + esc(p.nombre) + '</span>' + (aqui ? '<button type="button" class="btn-dia" data-bloq-dia="' + p.id + '">Bloquear día</button>' : '') + '</th>';
+    var nLib = CONFIG.horas.filter(function(h){ return !m[slotId(P.fecha, h, p.id)]; }).length;
+    var nBloq = bloqueosDe(p.id).length;
+    html += '<th scope="col"><span>' + esc(p.nombre) + '</span>' +
+      (aqui && nLib ? '<button type="button" class="btn-dia" data-bloq-dia="' + p.id + '">Bloquear día</button>' : '') +
+      (nBloq ? '<button type="button" class="btn-dia btn-desbloq" data-desbloq-dia="' + p.id + '">Desbloquear día</button>' : '') + '</th>';
   });
   html += '</tr></thead><tbody>';
-  CONFIG.horas.forEach(function(h){
+  horasDelDia().forEach(function(h){
     html += '<tr><th scope="row" class="col-hora">' + h + '</th>';
     cols.forEach(function(p){
       var id = slotId(P.fecha, h, p.id), o = m[id], pasado = enPasado(P.fecha, h) ? ' pasado' : '';
@@ -1212,6 +1408,7 @@ function pintarRejilla(){
 $('rejilla').addEventListener('click', function(ev){
   var b = ev.target.closest('button'); if (!b) return;
   if (b.hasAttribute('data-bloq-dia')) return confirmarBloqueoDia(b.getAttribute('data-bloq-dia'));
+  if (b.hasAttribute('data-desbloq-dia')) return confirmarDesbloqueoDia(b.getAttribute('data-desbloq-dia'));
   if (b.hasAttribute('data-libre')) return modalLibre(b.getAttribute('data-hora'), b.getAttribute('data-prof'));
   if (b.hasAttribute('data-id')) return modalOcupado(b.getAttribute('data-id'));
 });
@@ -1418,6 +1615,18 @@ function confirmarBloqueoDia(pid){
   $('bd-si').addEventListener('click', function(){
     this.disabled = true;
     Promise.all(libres.map(function(h){ return store.bloquear({ centro: P.centro, fecha: P.fecha, hora: h, prof: pid }).catch(function(){}); })).then(cerrarModal);
+  });
+}
+function confirmarDesbloqueoDia(pid){
+  var bl = bloqueosDe(pid);
+  abrirModal(cabModal('Desbloquear el día', prof(pid).nombre + ' · ' + fechaTxt(P.fecha)) +
+    '<p class="modal-sub">Se desbloquearán las ' + bl.length + (bl.length === 1 ? ' hora bloqueada' : ' horas bloqueadas') + ' de este día y volverán a estar libres en la web. Las citas no se tocan.</p>' +
+    '<p class="modal-sub">Para desbloquear solo una hora, cierra esta ventana y pulsa sobre esa hora.</p>' +
+    '<div class="modal-acciones"><button class="btn btn-lotus" type="button" id="dd-si">Desbloquear ' + bl.length + (bl.length === 1 ? ' hora' : ' horas') + '</button><button class="btn btn-linea" type="button" id="dd-no">Cancelar</button></div>');
+  $('dd-no').addEventListener('click', cerrarModal);
+  $('dd-si').addEventListener('click', function(){
+    this.disabled = true;
+    Promise.all(bl.map(function(o){ return store.liberar(o.id).catch(function(){}); })).then(cerrarModal);
   });
 }
 
