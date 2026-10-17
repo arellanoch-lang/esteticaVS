@@ -900,6 +900,7 @@ var CONFIG = {
   // Horas que se ofrecen en la web: cada 60 minutos, de 9:00 a 19:00
   horas: ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'],
   duracion: 60,                   // minutos que ocupa cada cita o bloqueo
+  margenSolape: 15,               // dos citas pueden pisarse hasta 15 min (los tratamientos duran 40-60 min)
   // En la agenda, la clínica puede apuntar citas a cualquier hora en tramos de 15 minutos
   primeraHora: '09:00', ultimaHora: '19:00', tramo: 15,
   // Enlaces de Google para pedir reseña (Google Business → «Pedir reseñas»). Vacío = el mensaje pide la reseña sin enlace.
@@ -936,7 +937,7 @@ function fechaTxt(s){ var d = parseYmd(s); return DIAS_L[d.getDay()] + ' ' + d.g
 function slotId(fecha, hora, prof){ return fecha + '_' + hora + '_' + prof; }
 function mins(h){ var x = h.split(':'); return +x[0] * 60 + +x[1]; }
 function hhmm(m){ return pad(Math.floor(m / 60)) + ':' + pad(m % 60); }
-function solapa(a, b){ return Math.abs(mins(a) - mins(b)) < (CONFIG.duracion || 60); }
+function solapa(a, b){ return Math.abs(mins(a) - mins(b)) < (CONFIG.duracion || 60) - (CONFIG.margenSolape || 0); }
 // primera cita/bloqueo de esa profesional que se pisa con una cita a «hora»
 function choca(lista, pid, hora, excluirId){
   for (var i = 0; i < lista.length; i++) { var o = lista[i]; if (o.prof === pid && o.id !== excluirId && solapa(o.hora, hora)) return o; }
@@ -1417,6 +1418,8 @@ function pintarRejilla(){
         var c = P.datos.citas[id] || {};
         var env = c.mensajes || {}, nEnv = MENSAJES.filter(function(m){ return env[m.k]; }).length;
         html += '<td class="celda cita' + pasado + '"><button type="button" data-id="' + id + '"><strong>' + esc(c.nombre || 'Cita') + '</strong><small>' + esc(c.servicio || '') + '</small><span class="puntos" aria-label="' + nEnv + ' de 3 mensajes enviados">' + MENSAJES.map(function(m){ return '<i class="' + (env[m.k] ? 'si' : '') + '"></i>'; }).join('') + '</span></button></td>';
+      } else if (choca(P.datos.ocupado, p.id, h) && CONFIG.horas.indexOf(h) < 0) {
+        html += '<td class="celda vacia"></td>';
       } else if (choca(P.datos.ocupado, p.id, h)) {
         var ch = choca(P.datos.ocupado, p.id, h);
         html += '<td class="celda solapa' + pasado + '"><button type="button" data-id="' + ch.id + '"><small>' + (ch.tipo === 'bloqueo' ? 'Bloqueo' : 'Cita') + ' a las ' + ch.hora + '</small></button></td>';
