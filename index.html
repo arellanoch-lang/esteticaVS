@@ -329,6 +329,8 @@ input[aria-invalid="true"]{border-color:#B03A6F}
 .btn-desbloq{color:var(--texto-suave);display:block}
 .agenda-sub{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
 .btn-nueva{padding:10px 18px;font-size:.68rem}
+.celda.sigue button{background:var(--rosa-palido);border:1px solid var(--rosa-empolvado);border-top-style:dashed;color:var(--texto-suave);font-size:.72rem;opacity:.85}
+.celda.sigue.sigue-bloq button{background:repeating-linear-gradient(45deg,#EFEAE8 0 6px,#E2DAD7 6px 12px);border-color:transparent}
 .celda.solapa button{background:#F6EEF1;color:var(--texto-suave);font-size:.72rem;border:1px dashed var(--rosa-empolvado);cursor:pointer}
 .ley-solapa::before{background:#F6EEF1;border:1px dashed var(--rosa-empolvado)}
 .modal .dos{grid-template-columns:1fr 1fr}
@@ -939,8 +941,15 @@ function mins(h){ var x = h.split(':'); return +x[0] * 60 + +x[1]; }
 function hhmm(m){ return pad(Math.floor(m / 60)) + ':' + pad(m % 60); }
 function solapa(a, b){ return Math.abs(mins(a) - mins(b)) < (CONFIG.duracion || 60) - (CONFIG.margenSolape || 0); }
 // primera cita/bloqueo de esa profesional que se pisa con una cita a «hora»
+// Una hora está ocupada si cae dentro de otra cita (de su inicio a inicio + duración)
+// o si una cita que empezara a esa hora se metería más de «margenSolape» minutos en la siguiente.
 function choca(lista, pid, hora, excluirId){
-  for (var i = 0; i < lista.length; i++) { var o = lista[i]; if (o.prof === pid && o.id !== excluirId && solapa(o.hora, hora)) return o; }
+  var dur = CONFIG.duracion || 60, margen = CONFIG.margenSolape || 0;
+  for (var i = 0; i < lista.length; i++) {
+    var o = lista[i]; if (o.prof !== pid || o.id === excluirId) continue;
+    var d = mins(hora) - mins(o.hora);
+    if ((d >= 0 && d < dur) || (d < 0 && -d < dur - margen)) return o;
+  }
   return null;
 }
 function horasTramo(){
@@ -1418,11 +1427,14 @@ function pintarRejilla(){
         var c = P.datos.citas[id] || {};
         var env = c.mensajes || {}, nEnv = MENSAJES.filter(function(m){ return env[m.k]; }).length;
         html += '<td class="celda cita' + pasado + '"><button type="button" data-id="' + id + '"><strong>' + esc(c.nombre || 'Cita') + '</strong><small>' + esc(c.servicio || '') + '</small><span class="puntos" aria-label="' + nEnv + ' de 3 mensajes enviados">' + MENSAJES.map(function(m){ return '<i class="' + (env[m.k] ? 'si' : '') + '"></i>'; }).join('') + '</span></button></td>';
-      } else if (choca(P.datos.ocupado, p.id, h) && CONFIG.horas.indexOf(h) < 0) {
-        html += '<td class="celda vacia"></td>';
       } else if (choca(P.datos.ocupado, p.id, h)) {
         var ch = choca(P.datos.ocupado, p.id, h);
-        html += '<td class="celda solapa' + pasado + '"><button type="button" data-id="' + ch.id + '"><small>' + (ch.tipo === 'bloqueo' ? 'Bloqueo' : 'Cita') + ' a las ' + ch.hora + '</small></button></td>';
+        var quien = ch.tipo === 'bloqueo' ? 'Bloqueado' : ((P.datos.citas[ch.id] || {}).nombre || 'Cita');
+        if (mins(h) > mins(ch.hora)) {
+          html += '<td class="celda sigue' + (ch.tipo === 'bloqueo' ? ' sigue-bloq' : '') + pasado + '"><button type="button" data-id="' + ch.id + '"><small>↳ ' + esc(quien) + '</small><small>hasta las ' + hhmm(mins(ch.hora) + (CONFIG.duracion || 60)) + '</small></button></td>';
+        } else {
+          html += '<td class="celda solapa' + pasado + '"><button type="button" data-id="' + ch.id + '"><small>Antes de la cita de las ' + ch.hora + '</small></button></td>';
+        }
       } else {
         if (!pasado) libres++;
         html += '<td class="celda libre' + pasado + '"><button type="button" data-libre="' + id + '" data-hora="' + h + '" data-prof="' + p.id + '" aria-label="' + h + ', ' + esc(p.nombre) + ', libre">+</button></td>';
