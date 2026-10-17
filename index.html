@@ -328,6 +328,17 @@ input[aria-invalid="true"]{border-color:#B03A6F}
 .celda.pasado{opacity:.55}
 .btn-desbloq{color:var(--texto-suave);display:block}
 .agenda-sub{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.agenda-botones{display:flex;flex-wrap:wrap;gap:8px}
+.modal.ancho{max-width:900px}
+.estado-grid{display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start}
+.estado-ctrl{display:flex;flex-direction:column;gap:12px;min-width:0}
+.estado-prev canvas{display:block;width:100%;height:auto;border-radius:12px;box-shadow:0 18px 40px -24px rgba(51,48,51,.5)}
+.es-dias{display:flex;flex-direction:column}
+.es-dia{display:grid;grid-template-columns:130px 1fr;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--linea)}
+.es-check{display:flex;align-items:center;gap:8px;font-size:.88rem;font-weight:600;cursor:pointer}
+.es-check input{width:18px;height:18px;margin:0;padding:0;accent-color:var(--lotus)}
+.es-horas{padding:8px 10px;font-size:.85rem;font-variant-numeric:tabular-nums}
+@media (max-width:720px){.estado-grid{grid-template-columns:1fr}.estado-prev{max-width:240px;margin:0 auto;order:-1}.es-dia{grid-template-columns:110px 1fr}}
 .btn-nueva{padding:10px 18px;font-size:.68rem}
 .celda.sigue button{background:var(--rosa-palido);border:1px solid var(--rosa-empolvado);border-top-style:dashed;color:var(--texto-suave);font-size:.72rem;opacity:.85}
 .celda.sigue.sigue-bloq button{background:repeating-linear-gradient(45deg,#EFEAE8 0 6px,#E2DAD7 6px 12px);border-color:transparent}
@@ -856,7 +867,7 @@ input[aria-invalid="true"]{border-color:#B03A6F}
         <button class="btn-texto" type="button" id="dia-hoy">Hoy</button>
       </div>
     </div>
-    <div class="agenda-sub"><p class="agenda-resumen" id="agenda-resumen" aria-live="polite"></p><button class="btn btn-lotus btn-nueva" type="button" id="btn-nueva">+ Cita a otra hora</button></div>
+    <div class="agenda-sub"><p class="agenda-resumen" id="agenda-resumen" aria-live="polite"></p><span class="agenda-botones"><button class="btn btn-linea btn-nueva" type="button" id="btn-estado">Crear estado</button><button class="btn btn-lotus btn-nueva" type="button" id="btn-nueva">+ Cita a otra hora</button></span></div>
     <div class="leyenda"><span class="ley ley-cita">Cita</span><span class="ley ley-bloq">Bloqueado</span><span class="ley ley-solapa">Ocupado por otra cita</span><span class="ley ley-libre">Libre</span></div>
     <div class="rejilla-scroll"><table class="rejilla" id="rejilla"></table></div>
   </section>
@@ -1375,6 +1386,7 @@ function cambiarDia(delta){
   P.fecha = ymd(d); suscribir();
 }
 $('btn-nueva').addEventListener('click', function(){ modalLibre(null, null); });
+$('btn-estado').addEventListener('click', function(){ modalEstado(); });
 $('dia-ant').addEventListener('click', function(){ cambiarDia(-1); });
 $('dia-sig').addEventListener('click', function(){ cambiarDia(1); });
 $('dia-hoy').addEventListener('click', function(){ var d = new Date(); d.setHours(0,0,0,0); P.fecha = ymd(d); if (!abierto(P.fecha)) { cambiarDia(1); return; } suscribir(); });
@@ -1460,7 +1472,7 @@ function abrirModal(html){
   $('modal-cuerpo').innerHTML = html; $('modal').hidden = false;
   var f = $('modal-cuerpo').querySelector('input,select,button'); (f || $('modal-cerrar')).focus();
 }
-function cerrarModal(){ $('modal').hidden = true; $('modal-cuerpo').innerHTML = ''; if (ultimoFoco) ultimoFoco.focus(); }
+function cerrarModal(){ document.querySelector('#modal .modal').classList.remove('ancho'); $('modal').hidden = true; $('modal-cuerpo').innerHTML = ''; if (ultimoFoco) ultimoFoco.focus(); }
 $('modal-cerrar').addEventListener('click', cerrarModal);
 $('modal').addEventListener('click', function(e){ if (e.target === this) cerrarModal(); });
 document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !$('modal').hidden) cerrarModal(); });
@@ -1692,6 +1704,133 @@ function confirmarDesbloqueoDia(pid){
     this.disabled = true;
     Promise.all(bl.map(function(o){ return store.liberar(o.id).catch(function(){}); })).then(cerrarModal);
   });
+}
+
+/* ---------- Estado de WhatsApp con los huecos libres ---------- */
+var DIAS_LARGOS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+function libresDia(oc, f, ce){
+  return CONFIG.horas.filter(function(h){
+    return !enPasado(f, h) && profsDe(ce).some(function(pp){ return trabaja(pp.id, ce, f) && !choca(oc, pp.id, h); });
+  });
+}
+function modalEstado(){
+  var ce = P.centro, dias = [], d = new Date(); d.setHours(0,0,0,0);
+  while (dias.length < 6) { var f = ymd(d); if (abierto(f)) dias.push(f); d.setDate(d.getDate() + 1); }
+  abrirModal(cabModal('Estado de WhatsApp', 'Huecos libres · ' + centro(ce).nombre) +
+    '<div class="estado-grid"><div class="estado-ctrl">' +
+    '<p class="modal-sub">Marca los días que quieres publicar. Las horas libres se rellenan solas con la agenda; puedes borrar o añadir horas escribiéndolas.</p>' +
+    '<div class="campo"><label for="es-titulo">Título</label><input id="es-titulo" value="Huecos libres"></div>' +
+    '<div class="es-dias" id="es-dias">' + dias.map(function(f, i){
+      var dd = parseYmd(f);
+      return '<div class="es-dia"><label class="es-check"><input type="checkbox" data-f="' + f + '"' + (i < 3 ? ' checked' : '') + '><span>' + DIAS_LARGOS[dd.getDay()] + ' ' + dd.getDate() + '</span></label>' +
+        '<input class="es-horas" data-f="' + f + '" aria-label="Horas libres del ' + fechaTxt(f) + '" placeholder="Cargando…"></div>';
+    }).join('') + '</div>' +
+    '<p class="aviso" id="es-aviso" role="status"></p>' +
+    '<div class="modal-acciones"><button class="btn btn-lotus" type="button" id="es-compartir">Compartir</button><button class="btn btn-linea" type="button" id="es-descargar">Descargar imagen</button></div>' +
+    '</div><div class="estado-prev"><canvas id="es-canvas" width="1080" height="1920" aria-label="Vista previa del estado"></canvas></div></div>');
+  document.querySelector('#modal .modal').classList.add('ancho');
+  Promise.all(dias.map(function(f){ return store.ocupados(f).then(function(oc){ return [f, libresDia(oc, f, ce)]; }, function(){ return [f, null]; }); }))
+    .then(function(res){
+      res.forEach(function(x){
+        var inp = document.querySelector('.es-horas[data-f="' + x[0] + '"]'); if (!inp) return;
+        inp.placeholder = x[1] === null ? 'No se han podido cargar' : 'Sin huecos';
+        inp.value = (x[1] || []).join('  ');
+      });
+      dibujar();
+    });
+  $('es-titulo').addEventListener('input', dibujar);
+  document.querySelectorAll('#es-dias input').forEach(function(i){ i.addEventListener('input', dibujar); i.addEventListener('change', dibujar); });
+  $('es-descargar').addEventListener('click', function(){ hacerPng(function(file){ bajar(file); }); });
+  $('es-compartir').addEventListener('click', function(){
+    hacerPng(function(file){
+      if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file], title: 'Huecos libres' }).catch(function(){});
+      else { bajar(file); $('es-aviso').textContent = 'Este dispositivo no permite compartir directamente: la imagen se ha descargado para que la subas al estado.'; }
+    });
+  });
+  var fuentes = ['300 120px "Cormorant Garamond"','italic 400 48px "Cormorant Garamond"','500 60px "Cormorant Garamond"','400 50px "Cormorant Garamond"','600 40px Manrope','500 26px Manrope','400 30px Manrope'];
+  Promise.all(fuentes.map(function(fu){ return document.fonts ? document.fonts.load(fu).catch(function(){}) : null; })).then(dibujar);
+
+  function bajar(file){
+    var a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name;
+    document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+  function hacerPng(cb){
+    dibujar();
+    $('es-canvas').toBlob(function(b){ cb(new File([b], 'huecos-libres-' + ce + '.png', { type: 'image/png' })); }, 'image/png');
+  }
+  function datos(){
+    var out = [];
+    document.querySelectorAll('#es-dias .es-dia').forEach(function(row){
+      var cb = row.querySelector('input[type=checkbox]'); if (!cb.checked) return;
+      var hs = (row.querySelector('.es-horas').value.match(/\d{1,2}[:.h]\d{2}/g) || []).map(function(h){ var x = h.split(/[:.h]/); return (+x[0]) + ':' + x[1]; });
+      if (hs.length) out.push({ f: cb.getAttribute('data-f'), horas: hs });
+    });
+    return out;
+  }
+  function pill(ctx, x, y, w, h){ var r2 = h / 2; ctx.beginPath(); ctx.moveTo(x + r2, y); ctx.arcTo(x + w, y, x + w, y + h, r2); ctx.arcTo(x + w, y + h, x, y + h, r2); ctx.arcTo(x, y + h, x, y, r2); ctx.arcTo(x, y, x + w, y, r2); ctx.closePath(); }
+  function rrect(ctx, x, y, w, h, r2){ ctx.beginPath(); ctx.moveTo(x + r2, y); ctx.arcTo(x + w, y, x + w, y + h, r2); ctx.arcTo(x + w, y + h, x, y + h, r2); ctx.arcTo(x, y + h, x, y, r2); ctx.arcTo(x, y, x + w, y, r2); ctx.closePath(); }
+  function loto(ctx, cx, top, esc2){
+    var ps = [['M32 6c6 7 8 15 8 22s-3 12-8 16c-5-4-8-9-8-16s2-15 8-22z', 'rgba(229,106,174,.9)'],
+      ['M32 44c-7-2-14-7-17-15-2-5-2-10-1-14 7 2 13 7 16 13', '#F2A7CC'], ['M32 44c7-2 14-7 17-15 2-5 2-10 1-14-7 2-13 7-16 13', '#F2A7CC'],
+      ['M32 44c-9 1-18-2-24-8-3-3-5-7-6-10 7-1 15 1 21 6', '#F7C8DD'], ['M32 44c9 1 18-2 24-8 3-3 5-7 6-10-7-1-15 1-21 6', '#F7C8DD']];
+    ctx.save(); ctx.translate(cx - 32 * esc2, top); ctx.scale(esc2, esc2);
+    ps.forEach(function(x){ ctx.fillStyle = x[1]; ctx.fill(new Path2D(x[0])); }); ctx.restore();
+  }
+  function maqueta(ctx, ds, k, pintar){
+    // devuelve la altura que ocupan los días con escala k
+    var y = 0, x0 = 130, x1 = 950, chipH = 76 * k, gap = 16 * k;
+    ds.forEach(function(dd){
+      var fd = parseYmd(dd.f);
+      ctx.font = '500 ' + Math.round(58 * k) + 'px "Cormorant Garamond", Georgia, serif';
+      if (pintar) { ctx.fillStyle = '#333033'; ctx.textAlign = 'left'; ctx.fillText(DIAS_LARGOS[fd.getDay()] + ' ' + fd.getDate() + ' de ' + MESES[fd.getMonth()], x0, pintar + y + 52 * k); }
+      y += 76 * k;
+      ctx.font = '600 ' + Math.round(38 * k) + 'px Manrope, Arial, sans-serif';
+      var x = x0;
+      dd.horas.forEach(function(h){
+        var w = ctx.measureText(h).width + 56 * k;
+        if (x + w > x1) { x = x0; y += chipH + gap; }
+        if (pintar) {
+          pill(ctx, x, pintar + y, w, chipH); ctx.fillStyle = '#E56AAE'; ctx.fill();
+          ctx.fillStyle = '#FFFFFF'; ctx.textAlign = 'center'; ctx.fillText(h, x + w / 2, pintar + y + chipH / 2 + 13 * k);
+        }
+        x += w + gap;
+      });
+      y += chipH + 52 * k;
+    });
+    return y;
+  }
+  function dibujar(){
+    var cv = $('es-canvas'); if (!cv) return;
+    var ctx = cv.getContext('2d'), W = 1080, H = 1920, ds = datos();
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#F2DDE5'; ctx.fillRect(0, 0, W, H);
+    rrect(ctx, 56, 56, W - 112, H - 112, 44); ctx.fillStyle = '#FAF7F4'; ctx.fill();
+    loto(ctx, W / 2, 130, 2.3);
+    ctx.textAlign = 'center';
+    try { ctx.letterSpacing = '10px'; } catch(e) {}
+    ctx.fillStyle = '#D9A6B5'; ctx.font = '400 50px "Cormorant Garamond", Georgia, serif'; ctx.fillText('VALÊNIA SIMÕES', W / 2, 310);
+    try { ctx.letterSpacing = '6px'; } catch(e) {}
+    ctx.fillStyle = '#6E6468'; ctx.font = '500 24px Manrope, Arial, sans-serif'; ctx.fillText(('Clínica de estética · ' + centro(ce).nombre).toUpperCase(), W / 2, 362);
+    try { ctx.letterSpacing = '0px'; } catch(e) {}
+    ctx.strokeStyle = '#D9A6B5'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(400, 410); ctx.lineTo(680, 410); ctx.stroke();
+    ctx.fillStyle = '#333033'; ctx.font = '300 120px "Cormorant Garamond", Georgia, serif'; ctx.fillText(($('es-titulo').value || 'Huecos libres').slice(0, 22), W / 2, 545);
+    ctx.fillStyle = '#6E6468'; ctx.font = 'italic 400 46px "Cormorant Garamond", Georgia, serif'; ctx.fillText('Reserva tu momento', W / 2, 612);
+    var top = 690, disponible = 1590 - top;
+    if (!ds.length) {
+      ctx.fillStyle = '#6E6468'; ctx.font = '400 36px Manrope, Arial, sans-serif'; ctx.fillText('Marca al menos un día con horas libres', W / 2, top + 200);
+    } else {
+      var k = 1, alto = maqueta(ctx, ds, 1, 0);
+      if (alto > disponible) k = Math.max(0.55, disponible / alto);
+      maqueta(ctx, ds, k, top);
+    }
+    ctx.strokeStyle = '#E7DCDD'; ctx.beginPath(); ctx.moveTo(130, 1620); ctx.lineTo(950, 1620); ctx.stroke();
+    ctx.textAlign = 'center';
+    try { ctx.letterSpacing = '6px'; } catch(e) {}
+    ctx.fillStyle = '#333033'; ctx.font = '600 28px Manrope, Arial, sans-serif'; ctx.fillText('RESERVA ONLINE', W / 2, 1690);
+    try { ctx.letterSpacing = '0px'; } catch(e) {}
+    ctx.fillStyle = '#6E6468'; ctx.font = '400 30px Manrope, Arial, sans-serif'; ctx.fillText((location.host + location.pathname).replace(/\/$/, '').replace(/index\.html$/, ''), W / 2, 1742);
+    ctx.fillStyle = '#E56AAE'; ctx.font = 'italic 400 46px "Cormorant Garamond", Georgia, serif'; ctx.fillText('o llámanos al ' + CONFIG.telefono.replace('+34 ', ''), W / 2, 1806);
+  }
 }
 
 ruta();
