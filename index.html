@@ -1483,16 +1483,16 @@ $('modal').addEventListener('click', function(e){ if (e.target === this) cerrarM
 document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !$('modal').hidden) cerrarModal(); });
 
 function cabModal(titulo, sub){ return '<p class="eyebrow">' + esc(sub) + '</p><h3 id="modal-titulo">' + esc(titulo) + '</h3>'; }
+function irCentro(id){ if (P.centro !== id) { P.centro = id; pintarBarra(); pintarRejilla(); } }
 function modalLibre(hora, pid){
   var opts = ''; SERVICIOS.forEach(function(g){ opts += '<optgroup label="' + esc(g.grupo) + '">' + g.items.map(function(i){ return '<option>' + esc(i) + '</option>'; }).join('') + '</optgroup>'; });
   opts += '<optgroup label="Por teléfono"><option>Manicura / pedicura</option><option>Micropigmentación</option></optgroup>';
-  var profs = profsDe(P.centro).filter(function(pp){ return trabaja(pp.id, P.centro, P.fecha); });
-  pid = pid || (profs[0] && profs[0].id);
   hora = hora || CONFIG.horas[0];
-  abrirModal(cabModal('Nueva cita', centro(P.centro).nombre + ' · ' + fechaTxt(P.fecha)) +
+  abrirModal(cabModal('Nueva cita', fechaTxt(P.fecha)) +
     '<form id="f-nueva" class="modal-form" novalidate>' +
     '<p class="modal-sub">Apunta una cita pedida por teléfono o bloquea una hora. Cada cita ocupa ' + (CONFIG.duracion || 60) + ' minutos.</p>' +
-    '<div class="dos"><div class="campo"><label for="n-prof">Profesional</label><select id="n-prof">' + profs.map(function(pp){ return '<option value="' + pp.id + '"' + (pp.id === pid ? ' selected' : '') + '>' + esc(pp.nombre) + '</option>'; }).join('') + '</select></div>' +
+    '<div class="campo"><label for="n-centro">Centro</label><select id="n-centro">' + CONFIG.centros.map(function(ce){ return '<option value="' + ce.id + '"' + (ce.id === P.centro ? ' selected' : '') + '>' + esc(ce.nombre) + '</option>'; }).join('') + '</select></div>' +
+    '<div class="dos"><div class="campo"><label for="n-prof">Profesional</label><select id="n-prof"></select></div>' +
     '<div class="campo"><label for="n-hora">Hora</label><select id="n-hora"></select></div></div>' +
     '<div class="campo"><label for="n-serv">Tratamiento</label><select id="n-serv">' + opts + '</select></div>' +
     '<div class="campo"><label for="n-nombre">Nombre</label><input id="n-nombre" autocomplete="off"></div>' +
@@ -1510,23 +1510,38 @@ function modalLibre(hora, pid){
     else if (ok.length) sel.value = ok[0].value;
     $('n-aviso').textContent = ok.length ? '' : 'Esta profesional no tiene huecos libres este día.';
   }
-  $('n-prof').addEventListener('change', pintarHoras); pintarHoras();
+  function pintarProfs(){
+    var ce = $('n-centro').value, prev = $('n-prof').value || pid;
+    var profs = profsDe(ce).filter(function(pp){ return trabaja(pp.id, ce, P.fecha); });
+    $('n-prof').innerHTML = profs.map(function(pp){ return '<option value="' + pp.id + '">' + esc(pp.nombre) + '</option>'; }).join('');
+    if (profs.some(function(pp){ return pp.id === prev; })) $('n-prof').value = prev;
+    else {
+      // otro centro: primera profesional libre a la hora elegida
+      var h = $('n-hora').value || hora;
+      var libre = profs.filter(function(pp){ return !choca(P.datos.ocupado, pp.id, h); })[0] || profs[0];
+      if (libre) $('n-prof').value = libre.id;
+    }
+    pintarHoras();
+  }
+  $('n-centro').addEventListener('change', pintarProfs);
+  $('n-prof').addEventListener('change', pintarHoras); pintarProfs();
   function datos(){
     var h = $('n-hora').value, p2 = $('n-prof').value;
     if (!h) { $('n-aviso').textContent = 'Elige una hora libre.'; return null; }
     if (choca(P.datos.ocupado, p2, h)) { $('n-aviso').textContent = 'Esa hora se pisa con otra cita. Elige otra.'; return null; }
-    return { centro: P.centro, fecha: P.fecha, hora: h, prof: p2 };
+    if (!p2) { $('n-aviso').textContent = 'No hay profesionales en este centro ese día.'; return null; }
+    return { centro: $('n-centro').value, fecha: P.fecha, hora: h, prof: p2 };
   }
   $('f-nueva').addEventListener('submit', function(e){
     e.preventDefault();
     var d = datos(); if (!d) return;
     var nombre = $('n-nombre').value.trim(); if (!nombre) { $('n-aviso').textContent = 'Escribe el nombre de la clienta.'; $('n-nombre').focus(); return; }
     store.reservar(Object.assign(d, { servicio: $('n-serv').value, nombre: nombre, telefono: $('n-tel').value.trim(), notas: '', origen: 'clinica' }))
-      .then(cerrarModal, function(){ $('n-aviso').textContent = 'Esa hora se acaba de ocupar. Elige otra.'; pintarHoras(); });
+      .then(function(){ irCentro(d.centro); cerrarModal(); }, function(){ $('n-aviso').textContent = 'Esa hora se acaba de ocupar. Elige otra.'; pintarHoras(); });
   });
   $('n-bloq').addEventListener('click', function(){
     var d = datos(); if (!d) return;
-    store.bloquear(d).then(cerrarModal, function(){ $('n-aviso').textContent = 'Esa hora ya está ocupada.'; pintarHoras(); });
+    store.bloquear(d).then(function(){ irCentro(d.centro); cerrarModal(); }, function(){ $('n-aviso').textContent = 'Esa hora ya está ocupada.'; pintarHoras(); });
   });
 }
 function modalOcupado(id){
