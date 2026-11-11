@@ -147,6 +147,12 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:co
 .paso p strong{display:block;color:var(--carbon);font-weight:600}
 form{background:var(--blanco);border-radius:var(--radio);padding:clamp(20px,3.5vw,36px);display:flex;flex-direction:column;gap:22px;min-width:0}
 .campo{display:flex;flex-direction:column;gap:8px;min-width:0}
+.campo-cl{position:relative}
+.sugerencias{position:static;margin:0;padding:4px;list-style:none;background:var(--blanco);border:1px solid var(--linea);border-radius:12px;box-shadow:0 10px 24px rgba(0,0,0,.12);z-index:5;max-height:240px;overflow:auto}
+.sugerencias[hidden]{display:none}
+.sugerencias li{display:flex;justify-content:space-between;gap:12px;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:.88rem;color:var(--carbon)}
+.sugerencias li span:last-child{color:var(--texto-suave);white-space:nowrap}
+.sugerencias li:hover,.sugerencias li[aria-selected="true"]{background:#F6EEF1}
 .campo > label,.campo > .etq{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:var(--carbon)}
 .dos{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media (max-width:560px){.dos{grid-template-columns:1fr}}
@@ -1119,6 +1125,7 @@ function DemoStore(){
       var s = { fecha: fecha, fn: fn }; subs.push(s); fn(dia(fecha));
       return function(){ subs = subs.filter(function(x){ return x !== s; }); };
     },
+    clientas: function(){ return Promise.resolve(Object.keys(data.citas).map(function(id){ return data.citas[id]; })); },
     nuevasCitas: function(desde, fn){
       var s = { desde: desde, fn: fn }; nuevasSubs.push(s); fn(nuevasDesde(desde));
       return function(){ nuevasSubs = nuevasSubs.filter(function(x){ return x !== s; }); };
@@ -1195,6 +1202,10 @@ function FirebaseStore(cfg){
         fin.push(x.db.collection('citas').where('fecha', '==', fecha).onSnapshot(function(q){ ci = {}; q.docs.forEach(function(d){ ci[d.id] = d.data(); }); fn({ ocupado: oc, citas: ci }); }));
       });
       return function(){ vivo = false; fin.forEach(function(f){ f(); }); };
+    },
+    clientas: function(){
+      // todas las citas guardadas: de ellas sale la lista de clientas (nombre + teléfono)
+      return listo.then(function(x){ return x.db.collection('citas').get(); }).then(function(q){ return q.docs.map(function(d){ return d.data(); }); });
     },
     nuevasCitas: function(desde, fn){
       // citas creadas después de «desde» (cualquier día): para avisar de las reservas de la web
@@ -1429,6 +1440,63 @@ function ruta(){
   else { document.title = 'Valênia Simões'; if (P.quitar) { P.quitar(); P.quitar = null; } }
 }
 window.addEventListener('hashchange', ruta);
+/* ---------- clientas: nombre y teléfono a partir de las citas ---------- */
+var CL = { lista: [], cargada: 0 };
+function normTel(t){ return String(t || '').replace(/\D/g, '').replace(/^0034|^34(?=\d{9}$)/, ''); }
+function sinTildes(t){ return String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim(); }
+function clientasAnadir(citas){
+  var mapa = {};
+  CL.lista.forEach(function(c){ mapa[c.clave] = c; });
+  citas.forEach(function(c){
+    var nombre = String(c.nombre || '').trim(), tel = String(c.telefono || '').trim();
+    if (!nombre || !normTel(tel)) return;
+    var clave = normTel(tel) + '|' + sinTildes(nombre), f = (c.fecha || '') + (c.hora || '');
+    if (!mapa[clave] || f > mapa[clave].f) mapa[clave] = { clave: clave, nombre: nombre, telefono: tel, f: f, busca: sinTildes(nombre), tel: normTel(tel) };
+  });
+  CL.lista = Object.keys(mapa).map(function(k){ return mapa[k]; }).sort(function(a, b){ return a.nombre.localeCompare(b.nombre, 'es'); });
+}
+function clientasCargar(){
+  if (Date.now() - CL.cargada < 5 * 60 * 1000) return;
+  CL.cargada = Date.now();
+  store.clientas().then(clientasAnadir, function(e){ CL.cargada = 0; console.warn('No se ha podido cargar la lista de clientas', e); });
+}
+function clientasBuscar(txt){
+  var q = sinTildes(txt), n = normTel(txt);
+  if (q.length < 2 && n.length < 3) return [];
+  return CL.lista.filter(function(c){
+    return (q.length >= 2 && c.busca.split(/\s+/).concat([c.busca]).some(function(w){ return w.indexOf(q) === 0; })) || (n.length >= 3 && c.tel.indexOf(n) >= 0);
+  }).slice(0, 8);
+}
+function autocompletarClienta(inNombre, inTel){
+  var ul = document.createElement('ul'); ul.className = 'sugerencias'; ul.hidden = true; ul.setAttribute('role', 'listbox'); ul.id = 'sug-cl';
+  inNombre.parentNode.appendChild(ul); inNombre.parentNode.classList.add('campo-cl');
+  inNombre.setAttribute('aria-autocomplete', 'list'); inNombre.setAttribute('aria-controls', 'sug-cl');
+  var res = [], sel = -1;
+  function pintar(){
+    ul.innerHTML = res.map(function(c, i){ return '<li role="option" data-i="' + i + '" aria-selected="' + (i === sel) + '"><span>' + esc(c.nombre) + '</span><span>' + esc(c.telefono) + '</span></li>'; }).join('');
+    ul.hidden = !res.length; inNombre.setAttribute('aria-expanded', String(!!res.length));
+  }
+  function elegir(c){ inNombre.value = c.nombre; inTel.value = c.telefono; res = []; sel = -1; pintar(); }
+  inNombre.addEventListener('input', function(){ res = clientasBuscar(inNombre.value); sel = -1; pintar(); });
+  inNombre.addEventListener('keydown', function(e){
+    if (ul.hidden) return;
+    if (e.key === 'ArrowDown') { sel = Math.min(sel + 1, res.length - 1); pintar(); e.preventDefault(); }
+    else if (e.key === 'ArrowUp') { sel = Math.max(sel - 1, 0); pintar(); e.preventDefault(); }
+    else if (e.key === 'Enter' && sel >= 0) { elegir(res[sel]); e.preventDefault(); }
+    else if (e.key === 'Escape') { res = []; pintar(); e.stopPropagation(); }
+  });
+  ul.addEventListener('mousedown', function(e){ e.preventDefault(); });
+  ul.addEventListener('click', function(e){ var li = e.target.closest('li'); if (li) elegir(res[+li.getAttribute('data-i')]); });
+  inNombre.addEventListener('blur', function(){ setTimeout(function(){ res = []; pintar(); }, 150); });
+  // si escriben primero el teléfono y coincide con una sola clienta, se rellena el nombre
+  inTel.addEventListener('change', function(){
+    if (inNombre.value.trim()) return;
+    var n = normTel(inTel.value); if (n.length < 9) return;
+    var m = CL.lista.filter(function(c){ return c.tel === n; });
+    if (m.length === 1) inNombre.value = m[0].nombre;
+  });
+}
+
 /* ---------- avisos de citas nuevas desde la web ---------- */
 var AV = { quitar: null, lista: [], conocidas: null, primera: true };
 function lsGet(k){ try { return localStorage.getItem(k); } catch(e) { return null; } }
@@ -1452,6 +1520,7 @@ function avisosTodosVistos(){
 function avisosIniciar(){
   avisosParar(); AV.primera = true; AV.conocidas = {};
   AV.quitar = store.nuevasCitas(avisoVistoHasta(), function(lista){
+    clientasAnadir(lista);
     AV.lista = lista.filter(function(c){ return c.origen === 'web'; });
     var llegadas = [];
     AV.lista.forEach(function(c){ var k = avisoClave(c); if (!AV.conocidas[k]) { AV.conocidas[k] = 1; if (!AV.primera) llegadas.push(c); } });
@@ -1507,7 +1576,7 @@ store.alCambiarSesion(function(u){
   $('usuario-email').textContent = u ? u.email : '';
   if (u && location.hash === '#agenda') suscribir();
   if (!u && P.quitar) { P.quitar(); P.quitar = null; }
-  if (u) avisosIniciar(); else avisosParar();
+  if (u) { avisosIniciar(); CL.cargada = 0; clientasCargar(); } else { avisosParar(); CL.lista = []; }
 });
 $('form-login').addEventListener('submit', function(ev){
   ev.preventDefault();
@@ -1683,12 +1752,13 @@ function modalLibre(hora, pid){
     if (!p2) { $('n-aviso').textContent = 'No hay profesionales en este centro ese día.'; return null; }
     return { centro: $('n-centro').value, fecha: F, hora: h, prof: p2 };
   }
+  clientasCargar(); autocompletarClienta($('n-nombre'), $('n-tel'));
   $('f-nueva').addEventListener('submit', function(e){
     e.preventDefault();
     var d = datos(); if (!d) return;
     var nombre = $('n-nombre').value.trim(); if (!nombre) { $('n-aviso').textContent = 'Escribe el nombre de la clienta.'; $('n-nombre').focus(); return; }
     store.reservar(Object.assign(d, { servicio: $('n-serv').value, nombre: nombre, telefono: $('n-tel').value.trim(), notas: '', origen: 'clinica' }))
-      .then(function(){ irCita(d); cerrarModal(); }, function(){ $('n-aviso').textContent = 'Esa hora se acaba de ocupar. Elige otra.'; pintarHoras(); });
+      .then(function(){ clientasAnadir([{ nombre: nombre, telefono: $('n-tel').value.trim(), fecha: d.fecha, hora: d.hora }]); irCita(d); cerrarModal(); }, function(){ $('n-aviso').textContent = 'Esa hora se acaba de ocupar. Elige otra.'; pintarHoras(); });
   });
   $('n-bloq').addEventListener('click', function(){
     var d = datos(); if (!d) return;
