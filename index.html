@@ -352,6 +352,26 @@ input[aria-invalid="true"]{border-color:#B03A6F}
 .celda.sigue.sigue-bloq button{background:repeating-linear-gradient(45deg,#EFEAE8 0 6px,#E2DAD7 6px 12px);border-color:transparent}
 .celda.solapa button{background:#F6EEF1;color:var(--texto-suave);font-size:.72rem;border:1px dashed var(--rosa-empolvado);cursor:pointer}
 .ley-solapa::before{background:#F6EEF1;border:1px dashed var(--rosa-empolvado)}
+/* citas reservadas desde la web */
+.celda.cita.web button{background:#E3EEE6;border-color:#8FB39A}
+.celda.sigue.web button{background:#E3EEE6;border-color:#8FB39A}
+.ley-web::before{background:#E3EEE6;border-color:#8FB39A}
+.etq-nueva{display:inline-block;align-self:flex-start;background:#A8326E;color:#fff;font-size:.6rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border-radius:4px;padding:1px 5px;line-height:1.4}
+/* avisos de citas nuevas */
+.avisos{border:1px solid #8FB39A;background:#F1F7F2;border-radius:14px;padding:14px 16px;display:grid;gap:10px}
+.avisos[hidden]{display:none}
+.avisos-cab{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.avisos-cab strong{font-size:.95rem;color:var(--carbon)}
+.avisos-lista{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.avisos-lista li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px;background:var(--blanco);border-radius:10px;padding:8px 12px;font-size:.84rem;color:var(--carbon)}
+.avisos-lista li span{min-width:0}
+.avisos-lista small{color:var(--texto-suave)}
+.avisos-botones{display:flex;flex-wrap:wrap;gap:8px}
+.btn-mini{font:inherit;font-size:.72rem;letter-spacing:.06em;padding:6px 12px;border-radius:999px;border:1px solid var(--carbon);background:var(--blanco);color:var(--carbon);cursor:pointer}
+.btn-mini:hover{border-color:var(--lotus);color:#A8326E}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:60;background:var(--carbon);color:#fff;border-radius:12px;padding:12px 16px;font-size:.88rem;box-shadow:0 8px 24px rgba(0,0,0,.18);width:min(520px,calc(100% - 32px));display:flex;gap:12px;align-items:center;justify-content:space-between}
+.toast[hidden]{display:none}
+.toast button{font:inherit;font-size:.78rem;background:none;border:1px solid #fff;color:#fff;border-radius:999px;padding:4px 10px;cursor:pointer}
 .modal .dos{grid-template-columns:1fr 1fr}
 @media (max-width:640px){
   .panel-cab-in{gap:12px}
@@ -877,10 +897,12 @@ input[aria-invalid="true"]{border-color:#B03A6F}
       </div>
     </div>
     <div class="agenda-sub"><p class="agenda-resumen" id="agenda-resumen" aria-live="polite"></p><span class="agenda-botones"><button class="btn btn-linea btn-nueva" type="button" id="btn-estado">Redes sociales</button><button class="btn btn-lotus btn-nueva" type="button" id="btn-nueva">+ Cita a otra hora</button></span></div>
-    <div class="leyenda"><span class="ley ley-cita">Cita</span><span class="ley ley-bloq">Bloqueado</span><span class="ley ley-solapa">Ocupado por otra cita</span><span class="ley ley-libre">Libre</span></div>
+    <div class="avisos" id="avisos" hidden aria-live="polite"></div>
+    <div class="leyenda"><span class="ley ley-web">Cita web</span><span class="ley ley-cita">Cita clínica</span><span class="ley ley-bloq">Bloqueado</span><span class="ley ley-solapa">Ocupado por otra cita</span><span class="ley ley-libre">Libre</span></div>
     <div class="rejilla-scroll"><table class="rejilla" id="rejilla"></table></div>
   </section>
 
+  <div class="toast" id="toast" role="status" hidden></div>
   <div class="modal-fondo" id="modal" hidden>
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
       <button class="modal-cerrar" type="button" id="modal-cerrar" aria-label="Cerrar">×</button>
@@ -1003,7 +1025,7 @@ function errOcupado(){ var e = new Error('ocupado'); e.code = 'ocupado'; return 
    ========================================================= */
 function DemoStore(){
   var KEY = 'vs-agenda-demo-3';
-  var data = null, subs = [], usuario = null, authSubs = [];
+  var data = null, subs = [], usuario = null, authSubs = [], nuevasSubs = [];
   try { var raw = localStorage.getItem(KEY); if (raw) data = JSON.parse(raw); } catch(e) {}
   if (!data || !data.ocupado) { data = { ocupado: {}, citas: {} }; sembrar(); }
 
@@ -1030,6 +1052,11 @@ function DemoStore(){
   function guardar(){
     try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e) {}
     subs.forEach(function(s){ s.fn(dia(s.fecha)); });
+    nuevasSubs.forEach(function(s){ s.fn(nuevasDesde(s.desde)); });
+  }
+  function nuevasDesde(desde){
+    return Object.keys(data.citas).filter(function(id){ return (data.citas[id].creada || 0) > desde; })
+      .map(function(id){ var c = data.citas[id]; return Object.assign({ id: id }, c, { creadaMs: c.creada }); });
   }
   function dia(fecha){
     var oc = [], ci = {};
@@ -1048,7 +1075,7 @@ function DemoStore(){
       return espera().then(function(){
         if (data.ocupado[id]) throw errOcupado();
         data.ocupado[id] = { centro: c.centro, fecha: c.fecha, hora: c.hora, prof: c.prof, tipo: 'cita' };
-        data.citas[id] = Object.assign({}, c);
+        data.citas[id] = Object.assign({}, c, { creada: Date.now() });
         guardar(); return id;
       });
     },
@@ -1072,6 +1099,10 @@ function DemoStore(){
     suscribirDia: function(fecha, fn){
       var s = { fecha: fecha, fn: fn }; subs.push(s); fn(dia(fecha));
       return function(){ subs = subs.filter(function(x){ return x !== s; }); };
+    },
+    nuevasCitas: function(desde, fn){
+      var s = { desde: desde, fn: fn }; nuevasSubs.push(s); fn(nuevasDesde(desde));
+      return function(){ nuevasSubs = nuevasSubs.filter(function(x){ return x !== s; }); };
     },
     entrar: function(email){ usuario = { email: email || 'demo@clinica' }; authSubs.forEach(function(f){ f(usuario); }); return Promise.resolve(); },
     salir: function(){ usuario = null; authSubs.forEach(function(f){ f(null); }); return Promise.resolve(); },
@@ -1145,6 +1176,17 @@ function FirebaseStore(cfg){
         fin.push(x.db.collection('citas').where('fecha', '==', fecha).onSnapshot(function(q){ ci = {}; q.docs.forEach(function(d){ ci[d.id] = d.data(); }); fn({ ocupado: oc, citas: ci }); }));
       });
       return function(){ vivo = false; fin.forEach(function(f){ f(); }); };
+    },
+    nuevasCitas: function(desde, fn){
+      // citas creadas después de «desde» (cualquier día): para avisar de las reservas de la web
+      var fin = null, vivo = true;
+      listo.then(function(x){
+        if (!vivo) return;
+        fin = x.db.collection('citas').where('creada', '>', firebase.firestore.Timestamp.fromMillis(desde)).onSnapshot(function(q){
+          fn(q.docs.map(function(d){ var v = d.data(); return Object.assign({ id: d.id }, v, { creadaMs: v.creada && v.creada.toMillis ? v.creada.toMillis() : Date.now() }); }));
+        }, function(e){ console.warn('Avisos de citas nuevas no disponibles', e); });
+      });
+      return function(){ vivo = false; if (fin) fin(); };
     },
     entrar: function(email, pass){ return listo.then(function(x){ return x.auth.signInWithEmailAndPassword(email, pass); }); },
     salir: function(){ return listo.then(function(x){ return x.auth.signOut(); }); },
@@ -1364,16 +1406,89 @@ function ruta(){
     window.scrollTo(0, 0); document.title = $('legal').querySelector('.legal-doc:not([hidden]) h1').textContent + ' · Valênia Simões';
     return;
   }
-  if (ag) { window.scrollTo(0, 0); document.title = 'Agenda · Valênia Simões'; if (P.usuario) suscribir(); }
+  if (ag) { window.scrollTo(0, 0); document.title = 'Agenda · Valênia Simões'; if (P.usuario) suscribir(); pintarAvisos(); }
   else { document.title = 'Valênia Simões'; if (P.quitar) { P.quitar(); P.quitar = null; } }
 }
 window.addEventListener('hashchange', ruta);
+/* ---------- avisos de citas nuevas desde la web ---------- */
+var AV = { quitar: null, lista: [], conocidas: null, primera: true };
+function lsGet(k){ try { return localStorage.getItem(k); } catch(e) { return null; } }
+function lsSet(k, v){ try { localStorage.setItem(k, v); } catch(e) {} }
+function avisoClave(c){ return String(c.creadaMs || (c.creada && c.creada.toMillis ? c.creada.toMillis() : c.creada) || '') + '|' + (c.nombre || ''); }
+function avisoVistoHasta(){ var v = +lsGet('vs-avisos-hasta'); return v || (Date.now() - 24 * 3600 * 1000); }
+function avisoVistas(){ try { return JSON.parse(lsGet('vs-avisos-vistas') || '[]'); } catch(e) { return []; } }
+function avisoPendiente(c){
+  if (!c || c.origen !== 'web') return false;
+  var t = c.creadaMs || (c.creada && c.creada.toMillis ? c.creada.toMillis() : c.creada) || 0;
+  return t > avisoVistoHasta() && avisoVistas().indexOf(avisoClave(c)) < 0;
+}
+function avisoVisto(c){
+  var v = avisoVistas(); v.push(avisoClave(c)); lsSet('vs-avisos-vistas', JSON.stringify(v.slice(-200)));
+  pintarAvisos(); if (P.datos && P.usuario) pintarRejilla();
+}
+function avisosTodosVistos(){
+  lsSet('vs-avisos-hasta', String(Date.now())); lsSet('vs-avisos-vistas', '[]');
+  pintarAvisos(); if (P.datos && P.usuario) pintarRejilla();
+}
+function avisosIniciar(){
+  avisosParar(); AV.primera = true; AV.conocidas = {};
+  AV.quitar = store.nuevasCitas(avisoVistoHasta(), function(lista){
+    AV.lista = lista.filter(function(c){ return c.origen === 'web'; });
+    var llegadas = [];
+    AV.lista.forEach(function(c){ var k = avisoClave(c); if (!AV.conocidas[k]) { AV.conocidas[k] = 1; if (!AV.primera) llegadas.push(c); } });
+    AV.primera = false;
+    pintarAvisos();
+    if (P.datos && P.usuario && location.hash === '#agenda') pintarRejilla();
+    llegadas.filter(avisoPendiente).forEach(avisarLlegada);
+  });
+}
+function avisosParar(){ if (AV.quitar) { AV.quitar(); AV.quitar = null; } AV.lista = []; pintarAvisos(); }
+function citaCorta(c){ var ce = centro(c.centro); return fechaTxt(c.fecha) + ', ' + c.hora + (ce ? ' · ' + ce.nombre : ''); }
+function pintarAvisos(){
+  var caja = $('avisos'); if (!caja) return;
+  var pend = AV.lista.filter(avisoPendiente).sort(function(a, b){ return (a.fecha + a.hora).localeCompare(b.fecha + b.hora); });
+  var base = document.title.replace(/^\(\d+\) /, '');
+  document.title = pend.length ? '(' + pend.length + ') ' + base : base;
+  if (!pend.length) { caja.hidden = true; caja.innerHTML = ''; return; }
+  var puede = 'Notification' in window && Notification.permission === 'default';
+  caja.innerHTML = '<div class="avisos-cab"><strong>' + (pend.length === 1 ? '1 cita nueva desde la web' : pend.length + ' citas nuevas desde la web') + '</strong>' +
+    '<span class="avisos-botones">' + (puede ? '<button type="button" class="btn-mini" data-av-permiso>Avisarme en este dispositivo</button>' : '') +
+    '<button type="button" class="btn-mini" data-av-todas>Marcar todas como vistas</button></span></div>' +
+    '<ul class="avisos-lista">' + pend.map(function(c, i){
+      return '<li><span><strong>' + esc(c.nombre || 'Cita') + '</strong> · ' + esc(c.servicio || '') + '<br><small>' + esc(citaCorta(c)) + '</small></span><button type="button" class="btn-mini" data-av-ver="' + i + '">Ver en la agenda</button></li>';
+    }).join('') + '</ul>';
+  caja.hidden = false;
+  caja._pend = pend;
+}
+$('avisos').addEventListener('click', function(ev){
+  var b = ev.target.closest('button'); if (!b) return;
+  if (b.hasAttribute('data-av-todas')) return avisosTodosVistos();
+  if (b.hasAttribute('data-av-permiso')) { Notification.requestPermission().then(pintarAvisos); return; }
+  if (b.hasAttribute('data-av-ver')) {
+    var c = ($('avisos')._pend || [])[+b.getAttribute('data-av-ver')]; if (!c) return;
+    P.centro = c.centro; P.fecha = c.fecha; suscribir(); window.scrollTo({ top: $('rejilla').getBoundingClientRect().top + window.scrollY - 120, behavior: 'smooth' });
+  }
+});
+function avisarLlegada(c){
+  var txt = 'Nueva cita web: ' + (c.nombre || '') + ' · ' + (c.servicio || '') + ' · ' + citaCorta(c);
+  var t = $('toast'); t.innerHTML = '<span>' + esc(txt) + '</span><button type="button">Ver</button>'; t.hidden = false;
+  t.querySelector('button').onclick = function(){ t.hidden = true; P.centro = c.centro; P.fecha = c.fecha; if (location.hash !== '#agenda') location.hash = '#agenda'; else suscribir(); };
+  clearTimeout(AV.tt); AV.tt = setTimeout(function(){ t.hidden = true; }, 12000);
+  try { if (navigator.vibrate) navigator.vibrate([120, 80, 120]); } catch(e) {}
+  try {
+    var A = window.AudioContext || window.webkitAudioContext;
+    if (A) { var ac = AV.ac || (AV.ac = new A()), o = ac.createOscillator(), g = ac.createGain(); o.type = 'sine'; o.frequency.value = 880; g.gain.setValueAtTime(0.0001, ac.currentTime); g.gain.exponentialRampToValueAtTime(0.2, ac.currentTime + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + 0.5); o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime + 0.5); }
+  } catch(e) {}
+  try { if ('Notification' in window && Notification.permission === 'granted' && document.hidden) new Notification('Nueva cita desde la web', { body: (c.nombre || '') + ' · ' + (c.servicio || '') + '\n' + citaCorta(c), tag: avisoClave(c) }); } catch(e) {}
+}
+
 store.alCambiarSesion(function(u){
   P.usuario = u;
   $('login').hidden = !!u; $('agenda-vista').hidden = !u; $('panel-usuario').hidden = !u;
   $('usuario-email').textContent = u ? u.email : '';
   if (u && location.hash === '#agenda') suscribir();
   if (!u && P.quitar) { P.quitar(); P.quitar = null; }
+  if (u) avisosIniciar(); else avisosParar();
 });
 $('form-login').addEventListener('submit', function(ev){
   ev.preventDefault();
@@ -1447,12 +1562,13 @@ function pintarRejilla(){
         citas++;
         var c = P.datos.citas[id] || {};
         var env = c.mensajes || {}, nEnv = MENSAJES.filter(function(m){ return env[m.k]; }).length;
-        html += '<td class="celda cita' + pasado + '"><button type="button" data-id="' + id + '"><strong>' + esc(c.nombre || 'Cita') + '</strong><small>' + esc(c.servicio || '') + '</small><span class="puntos" aria-label="' + nEnv + ' de 3 mensajes enviados">' + MENSAJES.map(function(m){ return '<i class="' + (env[m.k] ? 'si' : '') + '"></i>'; }).join('') + '</span></button></td>';
+        var esWeb = c.origen === 'web', esNueva = esWeb && avisoPendiente(c);
+        html += '<td class="celda cita' + (esWeb ? ' web' : '') + pasado + '"><button type="button" data-id="' + id + '"' + (esWeb ? ' aria-description="Reservada desde la web' + (esNueva ? ', nueva' : '') + '"' : '') + '>' + (esNueva ? '<span class="etq-nueva">Nueva</span>' : '') + '<strong>' + esc(c.nombre || 'Cita') + '</strong><small>' + esc(c.servicio || '') + '</small><span class="puntos" aria-label="' + nEnv + ' de 3 mensajes enviados">' + MENSAJES.map(function(m){ return '<i class="' + (env[m.k] ? 'si' : '') + '"></i>'; }).join('') + '</span></button></td>';
       } else if (choca(P.datos.ocupado, p.id, h)) {
         var ch = choca(P.datos.ocupado, p.id, h);
         var quien = ch.tipo === 'bloqueo' ? 'Bloqueado' : ((P.datos.citas[ch.id] || {}).nombre || 'Cita');
         if (mins(h) > mins(ch.hora)) {
-          html += '<td class="celda sigue' + (ch.tipo === 'bloqueo' ? ' sigue-bloq' : '') + pasado + '"><button type="button" data-id="' + ch.id + '"><small>↳ ' + esc(quien) + '</small><small>hasta las ' + hhmm(mins(ch.hora) + (CONFIG.duracion || 60)) + '</small></button></td>';
+          html += '<td class="celda sigue' + (ch.tipo === 'bloqueo' ? ' sigue-bloq' : '') + (((P.datos.citas[ch.id] || {}).origen === 'web') ? ' web' : '') + pasado + '"><button type="button" data-id="' + ch.id + '"><small>↳ ' + esc(quien) + '</small><small>hasta las ' + hhmm(mins(ch.hora) + (CONFIG.duracion || 60)) + '</small></button></td>';
         } else {
           html += '<td class="celda solapa' + pasado + '"><button type="button" data-id="' + ch.id + '"><small>Antes de la cita de las ' + ch.hora + '</small></button></td>';
         }
@@ -1563,6 +1679,7 @@ function modalLibre(hora, pid){
 function modalOcupado(id){
   var o = mapaOcupado()[id]; if (!o) return;
   var c = P.datos.citas[id], p = prof(o.prof);
+  if (c && avisoPendiente(c)) avisoVisto(c);
   if (o.tipo === 'bloqueo') {
     abrirModal(cabModal('Hora bloqueada', o.hora + ' · ' + p.nombre + ' · ' + fechaTxt(o.fecha)) +
       '<p class="modal-sub">Nadie puede reservar esta hora desde la web.</p><div class="modal-acciones"><button class="btn btn-lotus" type="button" id="m-lib">Desbloquear</button></div>');
